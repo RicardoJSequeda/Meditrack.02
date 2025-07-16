@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Historial Médico</title>
+    <link rel="stylesheet" href="Estilos/global.css">
+    <link rel="stylesheet" href="Estilos/Historial-Médic.css">
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <link rel="stylesheet" href="sidebar/sidebar-responsive.css">
+    <link rel="stylesheet" href="medibot/medibot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Librerías para funcionalidades reales -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navbar superior moderno -->
+    <div id="navbar-container"></div>
+        
+        <main class="main-content">
+            <div class="container">
+            <div class="header">
+                <div class="breadcrumbs">
+                    <a href="Inicio.html">Inicio</a> <i class="fas fa-chevron-right separator"></i> <span>Historial Médico</span>
+                </div>
+                <h1>Historial Médico</h1>
+            <p class="subtitle">Accede a tus diagnósticos, tratamientos, eventos y documentos médicos con análisis avanzado y búsqueda inteligente.</p>
+            </div>
+
+        <!-- NUEVAS SECCIONES DE ANÁLISIS AVANZADO -->
+        <section class="medical-overview">
+            <div class="section-header">
+                <h2>Vista General Médica</h2>
+                <div class="overview-controls">
+                    <button class="secondary-button small" id="generate-medical-summary">
+                        <i class="fas fa-file-medical"></i> Generar Resumen
+                    </button>
+                    <button class="secondary-button small" id="export-medical-history">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="overview-grid">
+                <div class="overview-card health-status">
+                    <div class="card-header">
+                        <i class="fas fa-heartbeat"></i>
+                        <h3>Estado de Salud General</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="health-indicators">
+                            <div class="indicator good">
+                                <span class="indicator-icon"><i class="fas fa-check-circle"></i></span>
+                                <div class="indicator-info">
+                                    <span class="indicator-value">Estable</span>
+                                    <span class="indicator-label">Estado general</span>
+                                </div>
+                            </div>
+                            <div class="indicator warning">
+                                <span class="indicator-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                                <div class="indicator-info">
+                                    <span class="indicator-value">2</span>
+                                    <span class="indicator-label">Condiciones activas</span>
+                                </div>
+                            </div>
+                            <div class="indicator info">
+                                <span class="indicator-icon"><i class="fas fa-calendar-check"></i></span>
+                                <div class="indicator-info">
+                                    <span class="indicator-value">15 días</span>
+                                    <span class="indicator-label">Próximo control</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="health-timeline">
+                            <canvas id="healthTimelineChart" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overview-card medication-overview">
+                    <div class="card-header">
+                        <i class="fas fa-pills"></i>
+                        <h3>Resumen de Medicación</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="medication-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">5</span>
+                                <span class="stat-label">Medicamentos activos</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">92%</span>
+                                <span class="stat-label">Adherencia general</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">3</span>
+                                <span class="stat-label">Dosis diarias</span>
+                            </div>
+                        </div>
+                        <div class="medication-alerts">
+                            <div class="alert-item warning">
+                                <i class="fas fa-clock"></i>
+                                <span>Losartán - Tomar en 2 horas</span>
+                            </div>
+                            <div class="alert-item info">
+                                <i class="fas fa-calendar"></i>
+                                <span>Renovar Metformina en 5 días</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overview-card recent-activity">
+                    <div class="card-header">
+                        <i class="fas fa-history"></i>
+                        <h3>Actividad Reciente</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-timeline">
+                            <div class="activity-item">
+                                <div class="activity-icon appointment">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <span class="activity-title">Cita con Cardiólogo</span>
+                                    <span class="activity-time">Hace 2 días</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon medication">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <span class="activity-title">Ajuste de dosis - Losartán</span>
+                                    <span class="activity-time">Hace 1 semana</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon test">
+                                    <i class="fas fa-flask"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <span class="activity-title">Análisis de sangre</span>
+                                    <span class="activity-time">Hace 2 semanas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+            <section class="patient-section">
+                <div class="section-header">
+                <h2>Información del Paciente</h2>
+                <div class="patient-controls">
+                    <button class="secondary-button small" id="change-patient">
+                        <i class="fas fa-exchange-alt"></i> Cambiar Paciente
+                    </button>
+                    <button class="secondary-button small" id="edit-patient-info">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="secondary-button small" id="export-patient-data">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                </div>
+            </div>
+            
+                <div class="patient-info-card">
+                    <div class="patient-details">
+                    <i class="fas fa-user-circle patient-icon"></i>
+                    <div class="info-text">
+                            <p class="patient-name">María López <span class="patient-age">(42 años)</span></p>
+                            <p class="patient-meta">
+                                <span class="meta-item"><i class="fas fa-id-card"></i> ID: MT-458792</span>
+                                <span class="meta-item"><i class="fas fa-tint"></i> A+</span>
+                            <span class="meta-item"><i class="fas fa-venus"></i> Femenino</span>
+                            </p>
+                        <div class="patient-contact">
+                            <span class="contact-item"><i class="fas fa-phone"></i> +34 612 345 678</span>
+                            <span class="contact-item"><i class="fas fa-envelope"></i> maria.lopez@email.com</span>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="patient-quickstats">
+                        <div class="stat-item">
+                            <span class="stat-number">3</span>
+                            <span class="stat-label">Diagnósticos</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">5</span>
+                            <span class="stat-label">Medicamentos</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">92%</span>
+                            <span class="stat-label">Adherencia</span>
+                        </div>
+                    <div class="stat-item">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label">Eventos</span>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                    <button class="warning-button small">
+                        <i class="fas fa-exclamation-triangle"></i> 2 alertas
+                    </button>
+                    <button class="info-button small">
+                        <i class="fas fa-calendar-check"></i> Cita próxima
+                    </button>
+                    <button class="success-button small">
+                        <i class="fas fa-chart-line"></i> Ver evolución
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- BÚSQUEDA INTELIGENTE -->
+        <section class="smart-search">
+            <div class="section-header">
+                <h2>Búsqueda Inteligente</h2>
+                <div class="search-controls">
+                    <button class="secondary-button small" id="advanced-search">
+                        <i class="fas fa-search-plus"></i> Búsqueda Avanzada
+                    </button>
+                    <button class="secondary-button small" id="save-search">
+                        <i class="fas fa-bookmark"></i> Guardar Búsqueda
+                    </button>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Buscar en diagnósticos, tratamientos, eventos, documentos...">
+                    <button class="search-btn" id="perform-search">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label>Tipo:</label>
+                        <select id="search-type">
+                            <option value="">Todos</option>
+                            <option value="diagnosis">Diagnósticos</option>
+                            <option value="treatment">Tratamientos</option>
+                            <option value="event">Eventos</option>
+                            <option value="document">Documentos</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Fecha:</label>
+                        <select id="search-date">
+                            <option value="">Cualquier fecha</option>
+                            <option value="today">Hoy</option>
+                            <option value="week">Esta semana</option>
+                            <option value="month">Este mes</option>
+                            <option value="year">Este año</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Médico:</label>
+                        <input type="text" id="search-doctor" placeholder="Nombre del médico">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-results" id="search-results" style="display: none;">
+                <div class="results-header">
+                    <h3>Resultados de búsqueda</h3>
+                    <span class="results-count">0 resultados encontrados</span>
+                </div>
+                <div class="results-list" id="results-list">
+                    <!-- Los resultados se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </section>
+
+            <nav class="profile-tabs" aria-label="Navegación del historial médico">
+            <button class="tab-button active" data-tab="diagnostics">
+                <i class="fas fa-notes-medical"></i> Diagnósticos
+            </button>
+            <button class="tab-button" data-tab="treatments">
+                <i class="fas fa-prescription-bottle-alt"></i> Tratamientos
+            </button>
+            <button class="tab-button" data-tab="events">
+                <i class="fas fa-calendar-check"></i> Eventos
+            </button>
+            <button class="tab-button" data-tab="documents">
+                <i class="fas fa-file-medical-alt"></i> Documentos
+            </button>
+            <button class="tab-button" data-tab="timeline">
+                <i class="fas fa-clock"></i> Línea de Tiempo
+            </button>
+            </nav>
+
+            <div id="diagnostics-panel" class="tab-panel active">
+                <div class="section-header">
+                    <h2>Diagnósticos</h2>
+                <div class="actions-group">
+                    <button class="primary-button" id="add-diagnosis">
+                        <i class="fas fa-plus"></i> Añadir Diagnóstico
+                    </button>
+                    <button class="secondary-button" id="analyze-diagnoses">
+                        <i class="fas fa-chart-bar"></i> Análisis
+                    </button>
+                    <button class="secondary-button" id="export-diagnoses">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                </div>
+                </div>
+                <div class="diagnostics-grid">
+                <!-- Los diagnósticos se cargarán dinámicamente -->
+                    </div>
+            </div>
+
+            <div id="treatments-panel" class="tab-panel">
+                <div class="section-header">
+                    <h2>Tratamientos</h2>
+                    <div class="actions-group">
+                    <button class="primary-button" id="add-treatment">
+                        <i class="fas fa-plus"></i> Añadir Tratamiento
+                    </button>
+                    <button class="secondary-button" id="view-all-treatments-btn">
+                        <i class="fas fa-list"></i> Ver Todos
+                    </button>
+                    <button class="secondary-button" id="treatment-analytics">
+                        <i class="fas fa-chart-line"></i> Análisis
+                    </button>
+                    </div>
+                </div>
+                <div class="treatments-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                        <h4>No hay tratamientos activos</h4>
+                        <p>Agrega un nuevo tratamiento para empezar a gestionarlos.</p>
+                        <button class="primary-button small" id="add-treatment-empty">
+                            <i class="fas fa-plus"></i> Agregar tratamiento
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="events-panel" class="tab-panel">
+                <div class="section-header">
+                    <h2>Eventos Médicos</h2>
+                    <div class="actions-group">
+                    <button class="primary-button" id="add-event">
+                        <i class="fas fa-plus"></i> Registrar Evento
+                    </button>
+                    <button class="secondary-button" id="view-all-events-btn">
+                        <i class="fas fa-list"></i> Ver Todos
+                    </button>
+                    <button class="secondary-button" id="event-timeline">
+                        <i class="fas fa-clock"></i> Línea de Tiempo
+                    </button>
+                    </div>
+                </div>
+                <!-- Filtros de eventos médicos -->
+                <form id="medical-events-filter-form" class="filter-form" style="margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;">
+                  <div class="form-group">
+                    <label for="filter-event-name">Nombre</label>
+                    <input type="text" id="filter-event-name" placeholder="Buscar por nombre">
+                  </div>
+                  <div class="form-group">
+                    <label for="filter-event-hospital">Hospital</label>
+                    <input type="text" id="filter-event-hospital" placeholder="Buscar por hospital">
+                  </div>
+                  <div class="form-group">
+                    <label for="filter-event-doctor">Médico</label>
+                    <input type="text" id="filter-event-doctor" placeholder="Buscar por médico">
+                  </div>
+                  <div class="form-group">
+                    <label for="filter-event-date-start">Desde</label>
+                    <input type="date" id="filter-event-date-start">
+                  </div>
+                  <div class="form-group">
+                    <label for="filter-event-date-end">Hasta</label>
+                    <input type="date" id="filter-event-date-end">
+                  </div>
+                  <div class="form-group" style="display:flex;gap:0.5rem;">
+                    <button type="submit" class="primary-button small">Filtrar</button>
+                    <button type="reset" class="secondary-button small">Limpiar</button>
+                  </div>
+                </form>
+                <div class="events-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-check"></i>
+                        <h4>No hay eventos registrados</h4>
+                        <p>Registra un nuevo evento médico para mantener tu historial completo.</p>
+                        <button class="primary-button small" id="add-event-empty">
+                            <i class="fas fa-plus"></i> Registrar evento
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="documents-panel" class="tab-panel">
+                <div class="section-header">
+                    <h2>Documentos Médicos</h2>
+                    <div class="actions-group">
+                    <button class="primary-button" id="upload-document">
+                        <i class="fas fa-upload"></i> Subir Documento
+                    </button>
+                    <button class="secondary-button" id="view-all-documents-btn">
+                        <i class="fas fa-list"></i> Ver Todos
+                    </button>
+                    <button class="secondary-button" id="document-categories">
+                        <i class="fas fa-folder"></i> Categorías
+                    </button>
+                    </div>
+                </div>
+                <div class="documents-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-file-medical-alt"></i>
+                        <h4>No hay documentos subidos</h4>
+                        <p>Sube tus documentos médicos para tenerlos siempre a mano.</p>
+                        <button class="primary-button small" id="upload-document-empty">
+                            <i class="fas fa-upload"></i> Subir documento
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        <!-- NUEVA PESTAÑA: LÍNEA DE TIEMPO -->
+        <div id="timeline-panel" class="tab-panel">
+            <div class="section-header">
+                <h2>Línea de Tiempo Médica</h2>
+                <div class="actions-group">
+                    <button class="secondary-button" id="timeline-filters">
+                        <i class="fas fa-filter"></i> Filtros
+                    </button>
+                    <button class="secondary-button" id="timeline-export">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button class="secondary-button" id="timeline-print">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
+    </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-controls">
+                    <div class="timeline-period">
+                        <button class="period-btn active" data-period="all">Todo</button>
+                        <button class="period-btn" data-period="year">1 Año</button>
+                        <button class="period-btn" data-period="6months">6 Meses</button>
+                        <button class="period-btn" data-period="3months">3 Meses</button>
+                        <button class="period-btn" data-period="month">1 Mes</button>
+                    </div>
+                    <div class="timeline-view">
+                        <button class="view-btn active" data-view="timeline">
+                            <i class="fas fa-clock"></i> Línea
+                        </button>
+                        <button class="view-btn" data-view="calendar">
+                            <i class="fas fa-calendar-alt"></i> Calendario
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i> Lista
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="timeline-content">
+                    <div class="medical-timeline" id="medical-timeline">
+                        <!-- La línea de tiempo se generará dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS DE SALUD -->
+        <section class="health-statistics">
+            <div class="section-header">
+                <h2>Estadísticas de Salud</h2>
+                <p>Resumen visual de tu estado de salud y progreso médico</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Estado General</h3>
+                        <div class="stat-value">Estable</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Mejorando</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Adherencia Medicación</h3>
+                        <div class="stat-value">92%</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+5% este mes</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Próximas Citas</h3>
+                        <div class="stat-value">3</div>
+                        <div class="stat-trend neutral">
+                            <i class="fas fa-minus"></i>
+                            <span>En los próximos 30 días</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Alertas Activas</h3>
+                        <div class="stat-value">1</div>
+                        <div class="stat-trend warning">
+                            <i class="fas fa-exclamation"></i>
+                            <span>Renovar medicamento</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECOMENDACIONES PERSONALIZADAS -->
+        <section class="health-recommendations">
+            <div class="section-header">
+                <h2>Recomendaciones Personalizadas</h2>
+                <p>Sugerencias basadas en tu historial médico y estado actual</p>
+            </div>
+            
+            <div class="recommendations-grid">
+                <div class="recommendation-card priority-high">
+                    <div class="recommendation-header">
+                        <div class="priority-badge high">Alta Prioridad</div>
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Renovar Prescripción</h3>
+                    <p>Tu medicamento Losartán se agota en 5 días. Contacta a tu médico para renovar la prescripción.</p>
+                    <div class="recommendation-actions">
+                        <button class="btn-primary small">Contactar Médico</button>
+                        <button class="btn-secondary small">Recordar Más Tarde</button>
+                    </div>
+                </div>
+                
+                <div class="recommendation-card priority-medium">
+                    <div class="recommendation-header">
+                        <div class="priority-badge medium">Media Prioridad</div>
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Control de Presión Arterial</h3>
+                    <p>Programa tu próximo control de presión arterial. Se recomienda cada 3 meses para tu condición.</p>
+                    <div class="recommendation-actions">
+                        <button class="btn-primary small">Agendar Cita</button>
+                        <button class="btn-secondary small">Ver Opciones</button>
+                    </div>
+                </div>
+                
+                <div class="recommendation-card priority-low">
+                    <div class="recommendation-header">
+                        <div class="priority-badge low">Baja Prioridad</div>
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <h3>Actualizar Información</h3>
+                    <p>Completa tu perfil médico con información actualizada sobre alergias y medicamentos.</p>
+                    <div class="recommendation-actions">
+                        <button class="btn-primary small">Actualizar Perfil</button>
+                        <button class="btn-secondary small">Más Tarde</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HERRAMIENTAS RÁPIDAS -->
+        <section class="quick-tools">
+            <div class="section-header">
+                <h2>Herramientas Rápidas</h2>
+                <p>Acceso directo a funciones útiles para el manejo de tu salud</p>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Exportar Historial</h3>
+                    <p>Descarga tu historial médico completo en formato PDF</p>
+                    <button class="btn-primary" onclick="openExportModal()">Exportar</button>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h3>Compartir con Médico</h3>
+                    <p>Comparte tu información médica de forma segura</p>
+                    <button class="btn-primary" onclick="openShareModal()">Compartir</button>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Ver Análisis</h3>
+                    <p>Revisa gráficos y tendencias de tu salud</p>
+                    <button class="btn-primary" onclick="openAnalyticsModal()">Ver Análisis</button>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Configurar Alertas</h3>
+                    <p>Personaliza las notificaciones médicas</p>
+                    <button class="btn-primary" onclick="openAlertsModal()">Configurar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="diagnosis-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-notes-medical"></i> <span id="diagnosis-modal-title">Añadir Nuevo Diagnóstico</span></h3>
+                <button class="close-modal" data-modal-id="diagnosis-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="diagnosis-form">
+                    <input type="hidden" id="diagnosis-id">
+                    <div class="form-group">
+                        <label for="diagnosis-name">Nombre del Diagnóstico</label>
+                        <input type="text" id="diagnosis-name" placeholder="Ej: Hipertensión, Diabetes" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="diagnosis-date">Fecha del Diagnóstico</label>
+                        <input type="date" id="diagnosis-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="diagnosis-doctor">Médico responsable</label>
+                        <input type="text" id="diagnosis-doctor" placeholder="Nombre del médico">
+                    </div>
+                    <div class="form-group">
+                        <label for="diagnosis-severity">Gravedad</label>
+                        <select id="diagnosis-severity">
+                            <option value="stable">Estable</option>
+                            <option value="warning">Requiere atención</option>
+                            <option value="urgent">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="diagnosis-notes">Notas adicionales</label>
+                        <textarea id="diagnosis-notes" rows="3" placeholder="Detalles importantes sobre el diagnóstico"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="secondary-button" id="cancel-diagnosis">Cancelar</button>
+                        <button type="submit" class="primary-button">Guardar diagnóstico</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="treatment-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-prescription-bottle-alt"></i> <span id="treatment-modal-title">Agregar Nuevo Tratamiento</span></h3>
+                <button class="close-modal" data-modal-id="treatment-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="treatment-form">
+                    <input type="hidden" id="treatment-id">
+                    <div class="form-group">
+                        <label for="treatment-name">Nombre del Tratamiento</label>
+                        <input type="text" id="treatment-name" placeholder="Ej: Losartán 50mg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="treatment-diagnosis">Diagnóstico Asociado</label>
+                        <select id="treatment-diagnosis">
+                            <option value="">Seleccione un diagnóstico</option>
+                            </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="treatment-doctor">Médico Prescriptor</label>
+                        <input type="text" id="treatment-doctor" placeholder="Ej: Dr. Gómez" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="treatment-start-date">Fecha de Inicio</label>
+                        <input type="date" id="treatment-start-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="treatment-dosage">Dosis e Instrucciones</label>
+                        <input type="text" id="treatment-dosage" placeholder="Ej: 1 pastilla cada 24h con el desayuno" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="treatment-notes">Notas Adicionales</label>
+                        <textarea id="treatment-notes" rows="3" placeholder="Detalles importantes sobre el tratamiento..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="primary-button" id="save-treatment-btn">Guardar Tratamiento</button>
+                        <button type="button" class="secondary-button close-modal" data-modal-id="treatment-modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="treatment-details-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Detalles del Tratamiento</h3>
+                <button class="close-modal" data-modal-id="treatment-details-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Nombre:</strong> <span id="detail-treatment-name"></span></p>
+                <p><strong>Diagnóstico Asociado:</strong> <span id="detail-treatment-diagnosis"></span></p>
+                <p><strong>Médico:</strong> <span id="detail-treatment-doctor"></span></p>
+                <p><strong>Fecha de Inicio:</strong> <span id="detail-treatment-start-date"></span></p>
+                <p><strong>Dosis:</strong> <span id="detail-treatment-dosage"></span></p>
+                <p><strong>Notas:</strong> <span id="detail-treatment-notes"></span></p>
+                <p><strong>Adherencia:</strong> <span id="detail-treatment-adherence"></span>%</p>
+                <p><strong>Estado:</strong> <span id="detail-treatment-status"></span></p>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="secondary-button close-modal" data-modal-id="treatment-details-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="all-treatments-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-list"></i> Todos tus Tratamientos</h3>
+                <button class="close-modal" data-modal-id="all-treatments-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="treatments-list-modal">
+                    </div>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="secondary-button close-modal" data-modal-id="all-treatments-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="event-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-check"></i> <span id="event-modal-title">Registrar Nuevo Evento</span></h3>
+                <button class="close-modal" data-modal-id="event-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="event-form">
+                    <input type="hidden" id="event-id">
+                    <div class="form-group">
+                        <label for="event-name">Nombre del Evento</label>
+                        <input type="text" id="event-name" placeholder="Ej: Cirugía, Vacunación" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-date">Fecha del Evento</label>
+                        <input type="date" id="event-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-hospital">Hospital/Clínica</label>
+                        <input type="text" id="event-hospital" placeholder="Ej: Hospital Central">
+                    </div>
+                    <div class="form-group">
+                        <label for="event-doctor">Médico/Personal de Salud</label>
+                        <input type="text" id="event-doctor" placeholder="Ej: Dr. Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label for="event-description">Descripción</label>
+                        <textarea id="event-description" rows="4" placeholder="Detalles del evento, resultados, etc."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="primary-button" id="save-event-btn">Guardar Evento</button>
+                        <button type="button" class="secondary-button close-modal" data-modal-id="event-modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="event-details-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Detalles del Evento</h3>
+                <button class="close-modal" data-modal-id="event-details-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Nombre:</strong> <span id="detail-event-name"></span></p>
+                <p><strong>Fecha:</strong> <span id="detail-event-date"></span></p>
+                <p><strong>Hospital/Clínica:</strong> <span id="detail-event-hospital"></span></p>
+                <p><strong>Médico:</strong> <span id="detail-event-doctor"></span></p>
+                <p><strong>Descripción:</strong> <span id="detail-event-description"></span></p>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="secondary-button close-modal" data-modal-id="event-details-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="all-events-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-list"></i> Todos tus Eventos Médicos</h3>
+                <button class="close-modal" data-modal-id="all-events-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="event-list-modal">
+                    </div>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="secondary-button close-modal" data-modal-id="all-events-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="document-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-medical-alt"></i> <span id="document-modal-title">Subir Nuevo Documento</span></h3>
+                <button class="close-modal" data-modal-id="document-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="document-form">
+                    <input type="hidden" id="document-id">
+                    <div class="form-group">
+                        <label for="document-name">Nombre del Documento</label>
+                        <input type="text" id="document-name" placeholder="Ej: Resultados de laboratorio, Receta médica" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="document-date">Fecha del Documento</label>
+                        <input type="date" id="document-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="document-type">Tipo de Documento</label>
+                        <input type="text" id="document-type" placeholder="Ej: Análisis Clínico, Informe Médico">
+                    </div>
+                    <div class="form-group">
+                        <label for="document-description">Descripción</label>
+                        <textarea id="document-description" rows="4" placeholder="Breve descripción del contenido del documento..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="primary-button" id="save-document-btn">Guardar Documento</button>
+                        <button type="button" class="secondary-button close-modal" data-modal-id="document-modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="document-details-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Detalles del Documento</h3>
+                <button class="close-modal" data-modal-id="document-details-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Nombre:</strong> <span id="detail-document-name"></span></p>
+                <p><strong>Fecha:</strong> <span id="detail-document-date"></span></p>
+                <p><strong>Tipo:</strong> <span id="detail-document-type"></span></p>
+                <p><strong>Descripción:</strong> <span id="detail-document-description"></span></p>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="secondary-button close-modal" data-modal-id="document-details-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="all-documents-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-list"></i> Todos tus Documentos Médicos</h3>
+                <button class="close-modal" data-modal-id="all-documents-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="document-list-modal">
+                    </div>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="secondary-button close-modal" data-modal-id="all-documents-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="diagnosis-details-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Detalles del Diagnóstico</h3>
+                <button class="close-modal" data-modal-id="diagnosis-details-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Nombre:</strong> <span id="detail-diagnosis-name"></span></p>
+                <p><strong>Fecha:</strong> <span id="detail-diagnosis-date"></span></p>
+                <p><strong>Médico:</strong> <span id="detail-diagnosis-doctor"></span></p>
+                <p><strong>Gravedad:</strong> <span id="detail-diagnosis-severity"></span></p>
+                <p><strong>Última Lectura:</strong> <span id="detail-diagnosis-last-reading"></span></p>
+                <p><strong>Fecha Última Lectura:</strong> <span id="detail-diagnosis-last-reading-date"></span></p>
+                <p><strong>Adherencia:</strong> <span id="detail-diagnosis-adherence"></span>%</p>
+                <p><strong>Notas:</strong> <span id="detail-diagnosis-notes"></span></p>
+                <p><strong>Próximo Control:</strong> <span id="detail-diagnosis-next-control"></span></p>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="secondary-button close-modal" data-modal-id="diagnosis-details-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-confirmation-modal" class="modal-overlay">
+        <div class="modal-content small-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle"></i> Confirmación</h3>
+                <button class="close-modal" data-modal-id="custom-confirmation-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmation-message"></p>
+            </div>
+            <div class="modal-footer justify-center">
+                <button class="danger-button" id="confirm-action-btn">Confirmar</button>
+                <button class="secondary-button close-modal" data-modal-id="custom-confirmation-modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NUEVOS MODALES PARA FUNCIONALIDADES AVANZADAS -->
+    
+    <!-- Modal de Búsqueda Avanzada -->
+    <div id="advanced-search-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-search-plus"></i> Búsqueda Avanzada</h3>
+                <button class="close-modal" data-modal-id="advanced-search-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="advanced-search-form">
+                    <div class="search-section">
+                        <h4>Filtros de Contenido</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="advanced-keywords">Palabras Clave</label>
+                                <input type="text" id="advanced-keywords" placeholder="Síntomas, diagnósticos, medicamentos...">
+                            </div>
+                            <div class="form-group">
+                                <label for="advanced-category">Categoría</label>
+                                <select id="advanced-category">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="diagnosis">Diagnósticos</option>
+                                    <option value="treatment">Tratamientos</option>
+                                    <option value="medication">Medicamentos</option>
+                                    <option value="test">Pruebas médicas</option>
+                                    <option value="surgery">Cirugías</option>
+                                    <option value="vaccination">Vacunaciones</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="search-section">
+                        <h4>Filtros de Fecha</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="advanced-date-from">Desde</label>
+                                <input type="date" id="advanced-date-from">
+                            </div>
+                            <div class="form-group">
+                                <label for="advanced-date-to">Hasta</label>
+                                <input type="date" id="advanced-date-to">
+                            </div>
+                            <div class="form-group">
+                                <label for="advanced-date-preset">Presets</label>
+                                <select id="advanced-date-preset">
+                                    <option value="">Personalizado</option>
+                                    <option value="last-week">Última semana</option>
+                                    <option value="last-month">Último mes</option>
+                                    <option value="last-3months">Últimos 3 meses</option>
+                                    <option value="last-year">Último año</option>
+                                    <option value="this-year">Este año</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="search-section">
+                        <h4>Filtros de Personal Médico</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="advanced-doctor">Médico</label>
+                                <input type="text" id="advanced-doctor" placeholder="Nombre del médico">
+                            </div>
+                            <div class="form-group">
+                                <label for="advanced-specialty">Especialidad</label>
+                                <select id="advanced-specialty">
+                                    <option value="">Todas las especialidades</option>
+                                    <option value="cardiology">Cardiología</option>
+                                    <option value="endocrinology">Endocrinología</option>
+                                    <option value="neurology">Neurología</option>
+                                    <option value="orthopedics">Ortopedia</option>
+                                    <option value="dermatology">Dermatología</option>
+                                    <option value="general">Medicina General</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="advanced-hospital">Hospital/Clínica</label>
+                                <input type="text" id="advanced-hospital" placeholder="Nombre del centro médico">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="search-section">
+                        <h4>Filtros de Estado</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="advanced-severity">Gravedad</label>
+                                <select id="advanced-severity">
+                                    <option value="">Todas</option>
+                                    <option value="stable">Estable</option>
+                                    <option value="warning">Requiere atención</option>
+                                    <option value="urgent">Urgente</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="advanced-status">Estado</label>
+                                <select id="advanced-status">
+                                    <option value="">Todos</option>
+                                    <option value="active">Activo</option>
+                                    <option value="resolved">Resuelto</option>
+                                    <option value="ongoing">En curso</option>
+                                    <option value="completed">Completado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button" id="clear-advanced-search">Limpiar</button>
+                <button class="secondary-button" id="save-advanced-search">Guardar Búsqueda</button>
+                <button class="primary-button" id="execute-advanced-search">Buscar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Exportación -->
+    <div id="export-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-download"></i> Exportar Historial Médico</h3>
+                <button class="close-modal" data-modal-id="export-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="export-section">
+                        <h4>Formato de Exportación</h4>
+                        <div class="format-options">
+                            <label class="format-option">
+                                <input type="radio" name="export-format" value="pdf" checked>
+                                <div class="format-card">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>PDF</span>
+                                    <small>Documento imprimible</small>
+                                </div>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="export-format" value="excel">
+                                <div class="format-card">
+                                    <i class="fas fa-file-excel"></i>
+                                    <span>Excel</span>
+                                    <small>Datos tabulares</small>
+                                </div>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="export-format" value="json">
+                                <div class="format-card">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>JSON</span>
+                                    <small>Datos estructurados</small>
+                                </div>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="export-format" value="xml">
+                                <div class="format-card">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>XML</span>
+                                    <small>Formato estándar</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="export-section">
+                        <h4>Contenido a Exportar</h4>
+                        <div class="content-options">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-diagnoses" checked>
+                                <span>Diagnósticos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-treatments" checked>
+                                <span>Tratamientos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-events" checked>
+                                <span>Eventos médicos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-documents" checked>
+                                <span>Documentos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-analytics">
+                                <span>Análisis y estadísticas</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-timeline">
+                                <span>Línea de tiempo</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="export-section">
+                        <h4>Opciones de Exportación</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="export-date-range">Rango de Fechas</label>
+                                <select id="export-date-range">
+                                    <option value="all">Todo el historial</option>
+                                    <option value="last-year">Último año</option>
+                                    <option value="last-6months">Últimos 6 meses</option>
+                                    <option value="last-3months">Últimos 3 meses</option>
+                                    <option value="custom">Personalizado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="export-include-notes">Incluir Notas</label>
+                                <select id="export-include-notes">
+                                    <option value="all">Todas las notas</option>
+                                    <option value="important">Solo notas importantes</option>
+                                    <option value="none">Sin notas</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button close-modal" data-modal-id="export-modal">Cancelar</button>
+                <button class="primary-button" id="start-export" onclick="exportHistory()">Exportar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Compartir -->
+    <div id="share-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share-alt"></i> Compartir Historial Médico</h3>
+                <button class="close-modal" data-modal-id="share-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="share-options">
+                    <div class="share-section">
+                        <h4>Destinatario</h4>
+                        <div class="recipient-options">
+                            <label class="recipient-option">
+                                <input type="radio" name="share-recipient" value="doctor" checked>
+                                <div class="recipient-card">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Médico</span>
+                                    <small>Compartir con profesional de salud</small>
+                                </div>
+                            </label>
+                            <label class="recipient-option">
+                                <input type="radio" name="share-recipient" value="family">
+                                <div class="recipient-card">
+                                    <i class="fas fa-users"></i>
+                                    <span>Familiar</span>
+                                    <small>Compartir con familiares</small>
+                                </div>
+                            </label>
+                            <label class="recipient-option">
+                                <input type="radio" name="share-recipient" value="emergency">
+                                <div class="recipient-card">
+                                    <i class="fas fa-ambulance"></i>
+                                    <span>Emergencias</span>
+                                    <small>Acceso en caso de emergencia</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="share-section">
+                        <h4>Información de Contacto</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="share-email">Email</label>
+                                <input type="email" id="share-email" placeholder="email@ejemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="share-name">Nombre</label>
+                                <input type="text" id="share-name" placeholder="Nombre del destinatario">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="share-message">Mensaje (opcional)</label>
+                            <textarea id="share-message" rows="3" placeholder="Mensaje personalizado para el destinatario..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="share-section">
+                        <h4>Opciones de Compartir</h4>
+                        <div class="share-settings">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="share-expiry">
+                                <span>Establecer fecha de expiración</span>
+                            </label>
+                            <div class="form-group" id="expiry-date-group" style="display: none;">
+                                <label for="share-expiry-date">Fecha de expiración</label>
+                                <input type="date" id="share-expiry-date">
+                            </div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="share-password">
+                                <span>Proteger con contraseña</span>
+                            </label>
+                            <div class="form-group" id="password-group" style="display: none;">
+                                <label for="share-password-input">Contraseña</label>
+                                <input type="password" id="share-password-input" placeholder="Contraseña para acceder">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button close-modal" data-modal-id="share-modal">Cancelar</button>
+                <button class="primary-button" id="send-share">Compartir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Análisis de Salud -->
+    <div id="health-analytics-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-chart-line"></i> Análisis de Salud</h3>
+                <button class="close-modal" data-modal-id="health-analytics-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="analytics-tabs">
+                    <button class="analytics-tab active" data-tab="overview">Vista General</button>
+                    <button class="analytics-tab" data-tab="trends">Tendencias</button>
+                    <button class="analytics-tab" data-tab="medications">Medicación</button>
+                    <button class="analytics-tab" data-tab="risks">Análisis de Riesgos</button>
+                </div>
+                
+                <div class="analytics-content">
+                    <div id="analytics-overview" class="analytics-panel active">
+                        <div class="analytics-grid">
+                            <div class="analytics-card">
+                                <h4>Evolución de Diagnósticos</h4>
+                                <canvas id="diagnosisEvolutionChart" height="200"></canvas>
+                            </div>
+                            <div class="analytics-card">
+                                <h4>Adherencia a Tratamientos</h4>
+                                <canvas id="adherenceChart" height="200"></canvas>
+                            </div>
+                            <div class="analytics-card">
+                                <h4>Frecuencia de Eventos</h4>
+                                <canvas id="eventsFrequencyChart" height="200"></canvas>
+                            </div>
+                            <div class="analytics-card">
+                                <h4>Indicadores de Salud</h4>
+                                <div class="health-metrics">
+                                    <div class="metric-item">
+                                        <span class="metric-label">Presión Arterial</span>
+                                        <span class="metric-value">120/80</span>
+                                        <span class="metric-trend positive">↓</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Glucosa</span>
+                                        <span class="metric-value">95 mg/dL</span>
+                                        <span class="metric-trend stable">→</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Colesterol</span>
+                                        <span class="metric-value">180 mg/dL</span>
+                                        <span class="metric-trend negative">↑</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="analytics-trends" class="analytics-panel">
+                        <div class="trends-analysis">
+                            <h4>Análisis de Tendencias Temporales</h4>
+                            <canvas id="trendsChart" height="300"></canvas>
+                            <div class="trends-insights">
+                                <div class="insight-item positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>Mejora en la adherencia a medicamentos (+15%)</span>
+                                </div>
+                                <div class="insight-item warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Aumento en visitas de emergencia (+3 este mes)</span>
+                                </div>
+                                <div class="insight-item positive">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>Reducción en niveles de presión arterial</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="analytics-medications" class="analytics-panel">
+                        <div class="medication-analysis">
+                            <h4>Análisis de Medicación</h4>
+                            <div class="medication-charts">
+                                <div class="chart-container">
+                                    <h5>Efectividad por Medicamento</h5>
+                                    <canvas id="medicationEffectivenessChart" height="200"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h5>Horarios de Toma</h5>
+                                    <canvas id="medicationScheduleChart" height="200"></canvas>
+                                </div>
+                            </div>
+                            <div class="medication-recommendations">
+                                <h5>Recomendaciones</h5>
+                                <div class="recommendation-item">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Considerar ajustar horario de Losartán para mejorar adherencia</span>
+                                </div>
+                                <div class="recommendation-item">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Metformina muestra excelente efectividad, mantener dosis actual</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="analytics-risks" class="analytics-panel">
+                        <div class="risk-analysis">
+                            <h4>Análisis de Riesgos</h4>
+                            <div class="risk-factors">
+                                <div class="risk-factor high">
+                                    <div class="risk-header">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Riesgo Alto</span>
+                                    </div>
+                                    <div class="risk-content">
+                                        <h5>Interacción Medicamentosa</h5>
+                                        <p>Posible interacción entre Losartán y Ibuprofeno</p>
+                                        <button class="secondary-button small">Ver Detalles</button>
+                                    </div>
+                                </div>
+                                <div class="risk-factor medium">
+                                    <div class="risk-header">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>Riesgo Medio</span>
+                                    </div>
+                                    <div class="risk-content">
+                                        <h5>Olvido de Medicación</h5>
+                                        <p>15% de dosis omitidas en los últimos 30 días</p>
+                                        <button class="secondary-button small">Ver Estrategias</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button" id="export-analytics">Exportar Análisis</button>
+                <button class="secondary-button close-modal" data-modal-id="health-analytics-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Filtros de Línea de Tiempo -->
+    <div id="timeline-filters-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-filter"></i> Filtros de Línea de Tiempo</h3>
+                <button class="close-modal" data-modal-id="timeline-filters-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="timeline-filters">
+                    <div class="filter-section">
+                        <h4>Tipos de Eventos</h4>
+                        <div class="filter-options">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-diagnoses" checked>
+                                <span>Diagnósticos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-treatments" checked>
+                                <span>Tratamientos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-events" checked>
+                                <span>Eventos médicos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-documents" checked>
+                                <span>Documentos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-appointments">
+                                <span>Citas médicas</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-tests">
+                                <span>Pruebas médicas</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h4>Importancia</h4>
+                        <div class="filter-options">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-urgent" checked>
+                                <span>Urgente</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-important" checked>
+                                <span>Importante</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="filter-routine" checked>
+                                <span>Rutinario</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h4>Personal Médico</h4>
+                        <div class="form-group">
+                            <label for="timeline-doctor-filter">Médico</label>
+                            <select id="timeline-doctor-filter">
+                                <option value="">Todos los médicos</option>
+                                <option value="dr-gomez">Dr. Gómez</option>
+                                <option value="dr-perez">Dr. Pérez</option>
+                                <option value="dr-rodriguez">Dr. Rodríguez</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button" id="reset-timeline-filters">Restablecer</button>
+                <button class="primary-button" id="apply-timeline-filters">Aplicar Filtros</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES PARA HERRAMIENTAS RÁPIDAS -->
+    
+    <!-- Modal de Exportar Historial -->
+    <div id="export-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-download"></i> Exportar Historial Médico</h3>
+                <button class="close-modal" data-modal-id="export-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="export-section">
+                        <h4>Formato de Exportación</h4>
+                        <div class="format-options">
+                            <label class="format-option">
+                                <input type="radio" name="export-format" value="pdf" checked>
+                                <div class="format-card">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>PDF</span>
+                                    <small>Documento imprimible</small>
+                                </div>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="export-format" value="excel">
+                                <div class="format-card">
+                                    <i class="fas fa-file-excel"></i>
+                                    <span>Excel</span>
+                                    <small>Datos tabulares</small>
+                                </div>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="export-format" value="json">
+                                <div class="format-card">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>JSON</span>
+                                    <small>Datos estructurados</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="export-section">
+                        <h4>Contenido a Exportar</h4>
+                        <div class="content-options">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-diagnoses" checked>
+                                <span>Diagnósticos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-treatments" checked>
+                                <span>Tratamientos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-events" checked>
+                                <span>Eventos médicos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-documents" checked>
+                                <span>Documentos</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-analytics">
+                                <span>Análisis y estadísticas</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="export-timeline">
+                                <span>Línea de tiempo</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="export-section">
+                        <h4>Opciones de Exportación</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="export-date-range">Rango de Fechas</label>
+                                <select id="export-date-range">
+                                    <option value="all">Todo el historial</option>
+                                    <option value="last-year">Último año</option>
+                                    <option value="last-6months">Últimos 6 meses</option>
+                                    <option value="last-3months">Últimos 3 meses</option>
+                                    <option value="custom">Personalizado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="export-include-notes">Incluir Notas</label>
+                                <select id="export-include-notes">
+                                    <option value="all">Todas las notas</option>
+                                    <option value="important">Solo notas importantes</option>
+                                    <option value="none">Sin notas</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button close-modal" data-modal-id="export-modal">Cancelar</button>
+                <button class="primary-button" id="start-export" onclick="exportHistory()">Exportar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Compartir con Médico -->
+    <div id="share-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share-alt"></i> Compartir Historial Médico</h3>
+                <button class="close-modal" data-modal-id="share-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="share-options">
+                    <div class="share-section">
+                        <h4>Destinatario</h4>
+                        <div class="recipient-options">
+                            <label class="recipient-option">
+                                <input type="radio" name="share-recipient" value="doctor" checked>
+                                <div class="recipient-card">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Médico</span>
+                                    <small>Compartir con profesional de salud</small>
+                                </div>
+                            </label>
+                            <label class="recipient-option">
+                                <input type="radio" name="share-recipient" value="family">
+                                <div class="recipient-card">
+                                    <i class="fas fa-users"></i>
+                                    <span>Familiar</span>
+                                    <small>Compartir con familiares</small>
+                                </div>
+                            </label>
+                            <label class="recipient-option">
+                                <input type="radio" name="share-recipient" value="emergency">
+                                <div class="recipient-card">
+                                    <i class="fas fa-ambulance"></i>
+                                    <span>Emergencias</span>
+                                    <small>Acceso en caso de emergencia</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="share-section">
+                        <h4>Información de Contacto</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="share-email">Email</label>
+                                <input type="email" id="share-email" placeholder="email@ejemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="share-name">Nombre</label>
+                                <input type="text" id="share-name" placeholder="Nombre del destinatario">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="share-message">Mensaje (opcional)</label>
+                            <textarea id="share-message" rows="3" placeholder="Mensaje personalizado para el destinatario..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="share-section">
+                        <h4>Opciones de Compartir</h4>
+                        <div class="share-settings">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="share-expiry">
+                                <span>Establecer fecha de expiración</span>
+                            </label>
+                            <div class="form-group" id="expiry-date-group" style="display: none;">
+                                <label for="share-expiry-date">Fecha de expiración</label>
+                                <input type="date" id="share-expiry-date">
+                            </div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="share-password">
+                                <span>Proteger con contraseña</span>
+                            </label>
+                            <div class="form-group" id="password-group" style="display: none;">
+                                <label for="share-password-input">Contraseña</label>
+                                <input type="password" id="share-password-input" placeholder="Contraseña para acceder">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button close-modal" data-modal-id="share-modal">Cancelar</button>
+                <button class="primary-button" id="send-share">Compartir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Análisis de Salud -->
+    <div id="analytics-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-chart-line"></i> Análisis de Salud</h3>
+                <button class="close-modal" data-modal-id="analytics-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="analytics-tabs">
+                    <button class="analytics-tab active" data-tab="overview">Vista General</button>
+                    <button class="analytics-tab" data-tab="trends">Tendencias</button>
+                    <button class="analytics-tab" data-tab="medications">Medicación</button>
+                    <button class="analytics-tab" data-tab="risks">Análisis de Riesgos</button>
+                </div>
+                
+                <div class="analytics-content">
+                    <div id="analytics-overview" class="analytics-panel active">
+                        <div class="analytics-grid">
+                            <div class="analytics-card">
+                                <h4>Evolución de Diagnósticos</h4>
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <p>Gráfico de evolución temporal</p>
+                                </div>
+                            </div>
+                            <div class="analytics-card">
+                                <h4>Adherencia a Tratamientos</h4>
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <p>Gráfico de adherencia</p>
+                                </div>
+                            </div>
+                            <div class="analytics-card">
+                                <h4>Frecuencia de Eventos</h4>
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-line"></i>
+                                    <p>Gráfico de frecuencia</p>
+                                </div>
+                            </div>
+                            <div class="analytics-card">
+                                <h4>Indicadores de Salud</h4>
+                                <div class="health-metrics">
+                                    <div class="metric-item">
+                                        <span class="metric-label">Presión Arterial</span>
+                                        <span class="metric-value">120/80</span>
+                                        <span class="metric-trend positive">↓</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Glucosa</span>
+                                        <span class="metric-value">95 mg/dL</span>
+                                        <span class="metric-trend stable">→</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Colesterol</span>
+                                        <span class="metric-value">180 mg/dL</span>
+                                        <span class="metric-trend negative">↑</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="analytics-trends" class="analytics-panel">
+                        <div class="trends-analysis">
+                            <h4>Análisis de Tendencias Temporales</h4>
+                            <div class="chart-placeholder large">
+                                <i class="fas fa-chart-line"></i>
+                                <p>Gráfico de tendencias temporales</p>
+                            </div>
+                            <div class="trends-insights">
+                                <div class="insight-item positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>Mejora en la adherencia a medicamentos (+15%)</span>
+                                </div>
+                                <div class="insight-item warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Aumento en visitas de emergencia (+3 este mes)</span>
+                                </div>
+                                <div class="insight-item positive">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>Reducción en niveles de presión arterial</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="analytics-medications" class="analytics-panel">
+                        <div class="medication-analysis">
+                            <h4>Análisis de Medicación</h4>
+                            <div class="medication-charts">
+                                <div class="chart-container">
+                                    <h5>Efectividad por Medicamento</h5>
+                                    <div class="chart-placeholder">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <p>Gráfico de efectividad</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <h5>Horarios de Toma</h5>
+                                    <div class="chart-placeholder">
+                                        <i class="fas fa-chart-pie"></i>
+                                        <p>Gráfico de horarios</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="medication-recommendations">
+                                <h5>Recomendaciones</h5>
+                                <div class="recommendation-item">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Considerar ajustar horario de Losartán para mejorar adherencia</span>
+                                </div>
+                                <div class="recommendation-item">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Metformina muestra excelente efectividad, mantener dosis actual</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="analytics-risks" class="analytics-panel">
+                        <div class="risk-analysis">
+                            <h4>Análisis de Riesgos</h4>
+                            <div class="risk-factors">
+                                <div class="risk-factor high">
+                                    <div class="risk-header">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Riesgo Alto</span>
+                                    </div>
+                                    <div class="risk-content">
+                                        <h5>Interacción Medicamentosa</h5>
+                                        <p>Posible interacción entre Losartán y Ibuprofeno</p>
+                                        <button class="secondary-button small">Ver Detalles</button>
+                                    </div>
+                                </div>
+                                <div class="risk-factor medium">
+                                    <div class="risk-header">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>Riesgo Medio</span>
+                                    </div>
+                                    <div class="risk-content">
+                                        <h5>Olvido de Medicación</h5>
+                                        <p>15% de dosis omitidas en los últimos 30 días</p>
+                                        <button class="secondary-button small">Ver Estrategias</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button" id="export-analytics">Exportar Análisis</button>
+                <button class="secondary-button close-modal" data-modal-id="analytics-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurar Alertas -->
+    <div id="alerts-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-bell"></i> Configurar Alertas Médicas</h3>
+                <button class="close-modal" data-modal-id="alerts-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alerts-configuration">
+                    <div class="alert-section">
+                        <h4>Tipos de Alertas</h4>
+                        <div class="alert-types">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="alert-medication" checked>
+                                <span>Recordatorios de medicación</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="alert-appointments" checked>
+                                <span>Recordatorios de citas</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="alert-controls">
+                                <span>Controles médicos pendientes</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="alert-renewals">
+                                <span>Renovación de prescripciones</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="alert-results">
+                                <span>Resultados de laboratorio</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-section">
+                        <h4>Configuración de Notificaciones</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="alert-frequency">Frecuencia</label>
+                                <select id="alert-frequency">
+                                    <option value="immediate">Inmediata</option>
+                                    <option value="daily">Diaria</option>
+                                    <option value="weekly">Semanal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="alert-time">Hora preferida</label>
+                                <input type="time" id="alert-time" value="09:00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-method">Método de notificación</label>
+                            <select id="alert-method">
+                                <option value="app">Solo en la aplicación</option>
+                                <option value="email">Email</option>
+                                <option value="sms">SMS</option>
+                                <option value="all">Todos los métodos</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-section">
+                        <h4>Alertas Específicas</h4>
+                        <div class="specific-alerts">
+                            <div class="specific-alert">
+                                <div class="alert-info">
+                                    <h5>Losartán 50mg</h5>
+                                    <p>Recordatorio diario a las 8:00 AM</p>
+                                </div>
+                                <div class="alert-toggle">
+                                    <input type="checkbox" id="alert-losartan" checked>
+                                    <label for="alert-losartan"></label>
+                                </div>
+                            </div>
+                            <div class="specific-alert">
+                                <div class="alert-info">
+                                    <h5>Metformina 850mg</h5>
+                                    <p>Recordatorio cada 12 horas</p>
+                                </div>
+                                <div class="alert-toggle">
+                                    <input type="checkbox" id="alert-metformina" checked>
+                                    <label for="alert-metformina"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-button close-modal" data-modal-id="alerts-modal">Cancelar</button>
+                <button class="primary-button" id="save-alerts">Guardar Configuración</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+    <div class="medibot-toggle" id="medibotToggle" role="button" aria-expanded="false" aria-controls="medibotContainer">
+        <i class="fa-solid fa-user-doctor"></i>
+        <span class="notification-badge hidden" id="notificationBadge" aria-live="polite" aria-atomic="true">1</span>
+    </div>
+
+    <div class="medibot-container" id="medibotContainer" aria-live="polite" aria-atomic="true" role="dialog" aria-labelledby="medibotHeaderTitle">
+        <div class="medibot-header" id="medibotHeader">
+            <div class="header-content">
+                <i class="fas fa-robot"></i>
+                <h2 id="medibotHeaderTitle">MediBot</h2>
+                <span class="connection-status">
+                    <i class="fas fa-circle online-status" aria-hidden="true"></i>
+                    Online
+                </span>
+            </div>
+            <div class="header-controls">
+                <button class="control-btn" id="medibotVoice" aria-label="Activar/Desactivar voz">
+                    <i class="fas fa-volume-up" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotMinimize" aria-label="Minimizar chatbot">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotClose" aria-label="Cerrar chatbot">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="medibot-messages" id="medibotMessages" role="log" aria-live="polite"></div>
+
+        <div class="medibot-quick-actions" id="medibotQuickActions" role="group" aria-label="Acciones rápidas del chatbot"></div>
+
+        <div class="medibot-input-area">
+            <input type="text" class="medibot-input" id="medibotInput" placeholder="Escribe tu mensaje..." aria-label="Escribe tu mensaje">
+            <button class="voice-btn" id="medibotVoiceInput" aria-label="Entrada de voz">
+                <i class="fas fa-microphone" aria-hidden="true"></i>
+            </button>
+            <button class="send-btn" id="medibotSend" aria-label="Enviar mensaje">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+    
+    <script src="sidebar/sidebar.js"></script>
+    <script src="medibot/medibot.js"></script>
+    <script src="Scripts/HistorialMedico.js"></script>
+    
+    <script>
+        // Cargar el navbar superior moderno
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar el navbar desde el archivo sidebar.html
+            fetch('sidebar/sidebar.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('navbar-container').innerHTML = html;
+                    
+                    // Inicializar el sidebar si existe la función
+                    if (typeof initializeSidebar === 'function') {
+                        initializeSidebar();
+                    }
+                    
+                    // Marcar la página actual como activa
+                    const currentPageLink = document.querySelector('a[href="HistorialMedico.html"]');
+                    if (currentPageLink) {
+                        currentPageLink.classList.add('active');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar el navbar:', error);
+                });
+        });
+    </script>
+    
+    <!-- Modal para agregar/editar evento médico -->
+    <div class="modal-overlay" id="medical-event-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="medical-event-modal-title"><i class="fas fa-calendar-plus"></i> <span>Registrar Evento Médico</span></h3>
+          <button class="close-modal" data-modal-id="medical-event-modal">&times;</button>
+        </div>
+        <form id="medical-event-form">
+          <div id="medical-event-error" style="color:#dc2626;display:none;margin-bottom:10px;"></div>
+          <input type="hidden" id="medical-event-id">
+          <div class="form-group">
+            <label for="medical-event-name">Nombre del evento:</label>
+            <input type="text" id="medical-event-name" placeholder="Ej: Cirugía de Apendicectomía" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="medical-event-date">Fecha:</label>
+              <input type="date" id="medical-event-date" required>
+            </div>
+            <div class="form-group">
+              <label for="medical-event-hospital">Hospital/Clínica:</label>
+              <input type="text" id="medical-event-hospital" placeholder="Ej: Hospital Central de Montería">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="medical-event-doctor">Médico responsable:</label>
+            <input type="text" id="medical-event-doctor" placeholder="Ej: Dr. Juan Pérez (Cirujano)">
+          </div>
+          <div class="form-group">
+            <label for="medical-event-description">Descripción:</label>
+            <textarea id="medical-event-description" rows="3" placeholder="Describe el evento con detalle..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="secondary-button close-modal" data-modal-id="medical-event-modal">Cancelar</button>
+            <button type="submit" class="primary-button">Guardar Evento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    </body>
+</html>

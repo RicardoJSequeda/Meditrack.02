@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Consejos de Salud</title>
+    <link rel="stylesheet" href="Estilos/global.css">
+    <link rel="stylesheet" href="Estilos/Consejos.css">
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <link rel="stylesheet" href="sidebar/sidebar-responsive.css">
+    <link rel="stylesheet" href="medibot/medibot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Librerías para funcionalidades reales -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <!-- Navbar superior moderno -->
+    <div id="navbar-container"></div>
+    <main class="main-content health-tips-content">
+        <div class="page-header">
+            <div class="breadcrumbs">
+                <a href="Inicio.html">Inicio</a> <i class="fas fa-chevron-right separator"></i> <span>Consejos de Salud</span>
+            </div>
+            <h1>Consejos de Salud</h1>
+            <p class="page-subtitle">Recomendaciones personalizadas para mejorar tu bienestar y hábitos diarios.</p>
+            <div class="search-filter-container">
+                <div class="search-box">
+                    <input type="text" placeholder="Buscar consejos..." id="search-tips-input">
+                    <button class="search-button" id="search-tips-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="filter-dropdown">
+                    <select id="filter-category">
+                        <option value="all">Todos los temas</option>
+                        <option value="activity">Actividad física</option>
+                        <option value="nutrition">Nutrición</option>
+                        <option value="mental">Salud mental</option>
+                        <option value="sleep">Sueño</option>
+                    </select>
+                </div>
+                <button class="secondary-button small" id="show-favorites"><i class="fas fa-star"></i> Favoritos</button>
+                <button class="secondary-button small" id="export-tips"><i class="fas fa-file-export"></i> Exportar</button>
+                <button class="secondary-button small" id="share-tips"><i class="fas fa-share-alt"></i> Compartir</button>
+            </div>
+        </div>
+
+        <!-- Progreso y ranking -->
+        <section class="user-progress-section">
+            <div class="section-header">
+                <h2>Tu progreso y ranking</h2>
+                <button class="secondary-button small" id="view-ranking"><i class="fas fa-trophy"></i> Ranking</button>
+                <button class="secondary-button small" id="view-analysis"><i class="fas fa-chart-bar"></i> Análisis</button>
+            </div>
+            <div class="progress-carousel-wrapper">
+                <button class="progress-carousel-arrow left" id="progress-carousel-left" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                <div class="progress-carousel" id="progress-carousel">
+                    <!-- Cards de progreso aquí -->
+                </div>
+                <button class="progress-carousel-arrow right" id="progress-carousel-right" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="ranking-modal modal-overlay" id="ranking-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-trophy"></i> Ranking de Usuarios</h3>
+                        <button class="close-modal" data-modal-id="ranking-modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <ol class="ranking-list">
+                            <li><span class="rank">1</span> <span class="user">María López</span> <span class="score">120 pts</span></li>
+                            <li><span class="rank">2</span> <span class="user">Juan Pérez</span> <span class="score">110 pts</span></li>
+                            <li><span class="rank">3</span> <span class="user">Ana Ruiz</span> <span class="score">105 pts</span></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Consejos destacados con carrusel -->
+        <section class="featured-tips">
+            <div class="section-header">
+                <h2>Consejos destacados</h2>
+                <div class="carousel-controls">
+                    <button class="carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                    <button class="carousel-next"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="featured-carousel">
+                <div class="featured-grid" id="featured-tips-grid">
+                    <!-- Cards de consejos destacados aquí -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Rutina Diaria debajo de Consejos Destacados -->
+        <section class="daily-routine-section" id="daily-routine-section">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-check"></i> Rutina Diaria</h2>
+                <p class="section-subtitle">Tus consejos agregados a la rutina diaria</p>
+            </div>
+            <div class="routine-cards-grid" id="routine-cards-grid">
+                <!-- Cards de rutina agregados dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Consejos personalizados -->
+        <section class="personalized-tips">
+            <div class="section-header">
+                <h2>Consejos para ti</h2>
+                <button class="secondary-button small" id="refresh-personalized"><i class="fas fa-sync-alt"></i> Actualizar</button>
+            </div>
+            <p class="section-subtitle">Basado en tu historial y preferencias</p>
+            <div class="personalized-grid" id="personalized-tips-grid">
+                <!-- Cards de consejos personalizados aquí -->
+            </div>
+        </section>
+
+        <!-- Retos de salud -->
+        <section class="health-challenges">
+            <div class="section-header">
+                <h2>Retos de salud</h2>
+            </div>
+            <div class="challenges-carousel-wrapper">
+                <button class="challenges-carousel-arrow left" id="challenges-carousel-left" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                <div class="challenges-carousel" id="challenges-carousel">
+                <!-- Cards de retos aquí -->
+                </div>
+                <button class="challenges-carousel-arrow right" id="challenges-carousel-right" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Modal de todos los retos -->
+        <div id="all-challenges-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-content large-modal all-challenges-modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-trophy"></i> Todos los Retos de Salud</h3>
+                    <button class="close-modal" id="close-all-challenges-modal" aria-label="Cerrar">&times;</button>
+                </div>
+                <div class="modal-body all-challenges-modal-body">
+                    <div class="all-challenges-carousel-wrapper">
+                        <button class="carousel-arrow left" id="carousel-left" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                        <div class="all-challenges-carousel" id="all-challenges-carousel">
+                            <!-- Cards de todos los retos aquí -->
+                        </div>
+                        <button class="carousel-arrow right" id="carousel-right" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Artículos y recursos -->
+        <section class="health-articles">
+            <div class="section-header">
+                <h2>Artículos y recursos</h2>
+                <button class="secondary-button small" id="view-all-articles"><i class="fas fa-book-open"></i> Ver todos</button>
+            </div>
+            <div class="articles-carousel-wrapper">
+                <button class="articles-carousel-arrow left" id="articles-carousel-left" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                <div class="articles-carousel" id="articles-carousel">
+                <!-- Cards de artículos aquí -->
+                </div>
+                <button class="articles-carousel-arrow right" id="articles-carousel-right" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modales para detalles, exportar, compartir, favoritos, etc. -->
+    <div id="tip-details-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-lightbulb"></i> Detalles del Consejo</h3>
+                <button class="close-modal" data-modal-id="tip-details-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+    <div id="detailed-tip-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Consejo Completo</h3>
+                <button class="close-modal" data-modal-id="detailed-tip-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+    <div id="export-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-export"></i> Exportar Consejos</h3>
+                <button class="close-modal" data-modal-id="export-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Elige el formato de exportación:</p>
+                <div class="export-options">
+                    <button class="primary-button" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="primary-button" id="export-excel"><i class="fas fa-file-excel"></i> Excel</button>
+                    <button class="primary-button" id="export-json"><i class="fas fa-file-code"></i> JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="share-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share-alt"></i> Compartir Consejos</h3>
+                <button class="close-modal" data-modal-id="share-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Comparte tus consejos favoritos:</p>
+                <div class="share-options">
+                    <button class="primary-button" id="share-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button class="primary-button" id="share-facebook"><i class="fab fa-facebook"></i> Facebook</button>
+                    <button class="primary-button" id="share-copy"><i class="fas fa-copy"></i> Copiar enlace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="favorites-modal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-star"></i> Tus Favoritos</h3>
+                <button class="close-modal" data-modal-id="favorites-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="favorites-grid" id="favorites-grid">
+                    <!-- Cards de favoritos aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="notification-container" class="notification-container"></div>
+    <div class="medibot-toggle" id="medibotToggle" role="button" aria-expanded="false" aria-controls="medibotContainer">
+        <i class="fa-solid fa-user-doctor"></i>
+        <span class="notification-badge hidden" id="notificationBadge" aria-live="polite" aria-atomic="true">1</span>
+    </div>
+    <div class="medibot-container" id="medibotContainer" aria-live="polite" aria-atomic="true" role="dialog" aria-labelledby="medibotHeaderTitle">
+        <div class="medibot-header" id="medibotHeader">
+            <div class="header-content">
+                <i class="fas fa-robot"></i>
+                <h2 id="medibotHeaderTitle">MediBot</h2>
+                <span class="connection-status">
+                    <i class="fas fa-circle online-status" aria-hidden="true"></i>
+                    Online
+                </span>
+            </div>
+            <div class="header-controls">
+                <button class="control-btn" id="medibotVoice" aria-label="Activar/Desactivar voz">
+                    <i class="fas fa-volume-up" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotMinimize" aria-label="Minimizar chatbot">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotClose" aria-label="Cerrar chatbot">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+        <div class="medibot-messages" id="medibotMessages" role="log" aria-live="polite"></div>
+        <div class="medibot-quick-actions" id="medibotQuickActions" role="group" aria-label="Acciones rápidas del chatbot"></div>
+        <div class="medibot-input-area">
+            <input type="text" class="medibot-input" id="medibotInput" placeholder="Escribe tu mensaje..." aria-label="Escribe tu mensaje">
+            <button class="voice-btn" id="medibotVoiceInput" aria-label="Entrada de voz">
+                <i class="fas fa-microphone" aria-hidden="true"></i>
+            </button>
+            <button class="send-btn" id="medibotSend" aria-label="Enviar mensaje">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+    <div id="analysis-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="analysis-modal-title">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="analysis-modal-title"><i class="fas fa-chart-bar"></i> Análisis y Estadísticas</h3>
+                <button class="close-modal" data-modal-id="analysis-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <canvas id="analysisChart" width="400" height="220" style="max-width:100%"></canvas>
+                <div id="analysis-summary" style="margin-top:1em;"></div>
+            </div>
+        </div>
+    </div>
+    <div id="routine-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="routine-modal-title"><i class="fas fa-calendar-plus"></i> Rutina Diaria</h3>
+                <button class="close-modal" data-modal-id="routine-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="routine-list"></div>
+            </div>
+        </div>
+    </div>
+    <div id="reminders-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reminders-modal-title">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="reminders-modal-title"><i class="fas fa-bell"></i> Recordatorios Activos</h3>
+                <button class="close-modal" data-modal-id="reminders-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="reminders-list"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal para artículo completo -->
+    <div id="full-article-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-content large-modal full-article-modal-content">
+            <div class="modal-header">
+                <h3 id="full-article-title"><i class="fas fa-book-open"></i> Artículo</h3>
+                <button class="close-modal" id="close-full-article-modal" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body full-article-modal-body" id="full-article-body">
+                <!-- Contenido dinámico del artículo -->
+            </div>
+        </div>
+    </div>
+    <script src="sidebar/sidebar.js"></script>
+    <script src="medibot/medibot.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="Scripts/ConsejosSalud.js"></script>
+    <script>
+        // Cargar el navbar superior moderno
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('sidebar/sidebar.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('navbar-container').innerHTML = html;
+                    if (typeof initializeSidebar === 'function') { initializeSidebar(); }
+                    const currentPageLink = document.querySelector('a[href="ConsejosSalud.html"]');
+                    if (currentPageLink) { currentPageLink.classList.add('active'); }
+                })
+                .catch(error => { console.error('Error al cargar el navbar:', error); });
+        });
+    </script>
+</body>
+</html>

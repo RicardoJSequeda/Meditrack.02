@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Notas Personales</title>
+    <link rel="stylesheet" href="NotasPersonales.css">
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <link rel="stylesheet" href="sidebar/sidebar-responsive.css">
+    <link rel="stylesheet" href="medibot/medibot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>body { padding-top: 80px; } .main-content { margin-left: 0; max-width: 1400px; margin: 0 auto; } @media (max-width: 768px) { body { padding-top: 70px; } }</style>
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <aside id="sidebar-container"></aside>
+        <main class="main-content personal-notes-content" role="main" aria-label="Contenido principal">
+            <header class="page-header">
+                <div class="breadcrumbs">
+                <a href="Inicio.html"><i class="fas fa-home"></i> Inicio</a>
+                    <i class="fas fa-chevron-right separator"></i>
+                    <span><i class="fas fa-sticky-note"></i> Notas Personales</span>
+                </div>
+                <div class="header-actions">
+                    <div class="stats-summary">
+                <div class="stat-item"><i class="fas fa-sticky-note"></i><span id="total-notes-stat">0 <small>Notas totales</small></span></div>
+                <div class="stat-item"><i class="fas fa-calendar-week"></i><span id="this-week-notes-stat">0 <small>Esta semana</small></span></div>
+                <div class="stat-item"><i class="fas fa-chart-line"></i><span id="notes-trend-stat">0 <small>Tendencia</small></span></div>
+                </div>
+                <div class="header-buttons">
+                <button class="primary-button" id="add-new-note-button"><i class="fas fa-plus"></i> Nueva Nota</button>
+                </div>
+                </div>
+                <h1>Notas Personales</h1>
+                <p class="page-subtitle">Registra tus pensamientos, recordatorios y observaciones sobre tu salud.</p>
+    </header>
+    <section class="insights-section">
+        <div class="insights-grid">
+            <div class="insight-card"><i class="fas fa-head-side-cough"></i><div><h3>Patrón de síntomas</h3><p>Has reportado dolor de cabeza 3 veces en los últimos 7 días</p></div></div>
+            <div class="insight-card"><i class="fas fa-pills"></i><div><h3>Medicaciones</h3><p>5 notas relacionadas con medicamentos en el último mes</p></div></div>
+            <div class="insight-card"><i class="fas fa-bell"></i><div><h3>Recordatorios activos</h3><p>2 recordatorios programados</p></div></div>
+            <div class="insight-card"><i class="fas fa-chart-line"></i><div><h3>Tendencia de salud</h3><p>Mejora del 15% en el estado de ánimo esta semana</p></div></div>
+            <div class="insight-card"><i class="fas fa-star"></i><div><h3>Notas importantes</h3><p>8 notas marcadas como importantes</p></div></div>
+            <div class="insight-card"><i class="fas fa-calendar-check"></i><div><h3>Próximas citas</h3><p>3 citas médicas programadas</p></div></div>
+                    </div>
+    </section>
+    <section class="quick-actions-section">
+                    <h3>Acciones Rápidas</h3>
+                    <div class="quick-actions-grid">
+                        <button class="quick-action-btn" data-action="symptom-tracker">
+                            <i class="fas fa-thermometer-half"></i>
+                            <span>Seguimiento Síntomas</span>
+                        </button>
+                    <button class="quick-action-btn" data-action="medication-tracker">
+                            <i class="fas fa-pills"></i>
+                            <span>Registro Medicamentos</span>
+                        </button>
+                        <button class="quick-action-btn" data-action="mood-tracker">
+                            <i class="fas fa-smile"></i>
+                            <span>Estado de Ánimo</span>
+                        </button>
+                    <button class="quick-action-btn" data-action="sleep-tracker">
+                            <i class="fas fa-bed"></i>
+                            <span>Registro de Sueño</span>
+                        </button>
+                </div>
+    </section>
+    <section class="notes-section">
+                    <header class="section-header">
+                            <h2><i class="fas fa-history"></i> Tus notas recientes</h2>
+                            <div class="filter-options">
+                                <select id="note-filter">
+                                    <option value="all">Todas las notas</option>
+                                    <option value="week">Esta semana</option>
+                                    <option value="month">Este mes</option>
+                                    <option value="symptom">Síntoma</option>
+                                    <option value="medication">Medicación</option>
+                                    <option value="appointment">Citas</option>
+                                    <option value="activity">Actividad</option>
+                                    <option value="diet">Dieta</option>
+                                    <option value="other">Otro</option>
+                                </select>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="search-input" placeholder="Buscar notas...">
+                            <button id="search-button"><i class="fas fa-search"></i></button>
+                    </div>
+                </header>
+        <div id="notes-grid-container"><!-- Las notas se renderizan dinámicamente --></div>
+                </section>
+        </main>
+    <!-- Modal Nueva Nota -->
+    <div id="addNoteModal" class="modal">
+        <div class="modal-content small-modal">
+            <div class="modal-header" style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #e6f4f1; padding-bottom: 1rem;">
+                <div style="background: linear-gradient(135deg, #1a7e7e 60%, #26a69a 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus" style="font-size: 2rem; color: #fff;"></i>
+                </div>
+                <h2 style="margin: 0; color: #1a7e7e; font-size: 1.4rem;">Nueva Nota</h2>
+                <button class="close-button" data-modal-id="addNoteModal">&times;</button>
+    </div>
+            <div class="modal-body" style="padding-top: 1.2rem;">
+                <form id="add-note-form" autocomplete="off">
+                    <div class="form-group floating-label-group">
+                        <input type="text" id="note-title" required maxlength="100" class="floating-input" placeholder=" " />
+                        <label for="note-title" class="floating-label">Título *</label>
+                        </div>
+                    <div class="form-group floating-label-group">
+                        <select id="note-category" required class="floating-input" placeholder=" ">
+                            <option value="" disabled selected hidden></option>
+                                <option value="symptom">Síntoma</option>
+                            <option value="medication">Medicamento</option>
+                            <option value="appointment">Cita</option>
+                                <option value="activity">Actividad</option>
+                                <option value="diet">Dieta</option>
+                                <option value="other">Otro</option>
+                            </select>
+                        <label for="note-category" class="floating-label">Categoría *</label>
+                        </div>
+                    <div class="form-group floating-label-group">
+                        <textarea id="note-description" rows="3" required maxlength="500" class="floating-input" placeholder=" "></textarea>
+                        <label for="note-description" class="floating-label">Descripción *</label>
+                    </div>
+                <div class="form-row">
+                        <div class="form-group floating-label-group" style="flex: 1;">
+                            <input type="text" id="note-tags-input" class="floating-input" placeholder=" " />
+                            <label for="note-tags-input" class="floating-label">Etiquetas</label>
+                                <div class="selected-tags"></div>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label style="margin-bottom: 0.4rem; color: #1a7e7e; font-weight: 500;">Estado de ánimo</label>
+                            <div class="mood-options" style="display: flex; gap: 0.5rem;">
+                                <input type="radio" name="mood" value="1" id="mood-1"><label for="mood-1"><i class="fas fa-grin-hearts"></i></label>
+                                <input type="radio" name="mood" value="2" id="mood-2"><label for="mood-2"><i class="fas fa-smile"></i></label>
+                                <input type="radio" name="mood" value="3" id="mood-3"><label for="mood-3"><i class="fas fa-meh"></i></label>
+                                <input type="radio" name="mood" value="4" id="mood-4"><label for="mood-4"><i class="fas fa-frown"></i></label>
+                                <input type="radio" name="mood" value="5" id="mood-5"><label for="mood-5"><i class="fas fa-sad-tear"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group floating-label-group" style="flex: 1;">
+                            <input type="file" id="note-image" accept="image/*,application/pdf" class="floating-input" placeholder=" ">
+                            <label for="note-image" class="floating-label">Imagen/Archivo</label>
+                    </div>
+                        <div class="form-group floating-label-group" style="flex: 1;">
+                            <input type="datetime-local" id="note-reminder" class="floating-input" placeholder=" ">
+                            <label for="note-reminder" class="floating-label">Recordatorio</label>
+                        </div>
+                    </div>
+                    <div class="form-group floating-label-group">
+                        <select id="note-priority" required class="floating-input" placeholder=" ">
+                            <option value="" disabled selected hidden></option>
+                            <option value="urgente">Urgente</option>
+                            <option value="alta">Alta</option>
+                            <option value="media">Media</option>
+                            <option value="normal">Normal</option>
+                            <option value="baja">Baja</option>
+                        </select>
+                        <label for="note-priority" class="floating-label">Nivel de prioridad *</label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="primary-button">Guardar</button>
+                        <button type="button" class="secondary-button close-button" data-modal-id="addNoteModal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal: Estadísticas de Síntomas -->
+    <div id="symptomStatsModal" class="modal">
+      <div class="modal-content large-modal">
+        <div class="modal-header" style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #e6f4f1; padding-bottom: 1rem;">
+          <div style="background: linear-gradient(135deg, #e57373 60%, #ffb74d 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-head-side-cough" style="font-size: 2rem; color: #fff;"></i>
+    </div>
+          <h2 style="margin: 0; color: #e57373; font-size: 1.3rem;">Estadísticas de síntomas</h2>
+          <button class="close-button" data-modal-id="symptomStatsModal">&times;</button>
+        </div>
+        <div class="modal-body" style="padding-top: 1.2rem;">
+          <div id="symptom-stats-summary" style="margin-bottom:1.2rem;"></div>
+          <div id="symptom-stats-chart" style="margin-bottom:1.2rem;"></div>
+          <div id="symptom-stats-list" style="margin-bottom:1.2rem;"></div>
+          <div id="symptom-stats-recommendations" style="margin-bottom:1.2rem;"></div>
+          <div style="text-align:right;">
+            <button type="button" class="secondary-button close-button" data-modal-id="symptomStatsModal">Cerrar</button>
+            </div>
+        </div>
+                </div>
+            </div>
+    <!-- Modal: Estadísticas de Medicamentos -->
+    <div id="medicationStatsModal" class="modal">
+      <div class="modal-content large-modal">
+        <div class="modal-header" style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #e6f4f1; padding-bottom: 1rem;">
+          <div style="background: linear-gradient(135deg, #4fc3f7 60%, #29b6f6 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-pills" style="font-size: 2rem; color: #fff;"></i>
+        </div>
+          <h2 style="margin: 0; color: #4fc3f7; font-size: 1.3rem;">Estadísticas de medicamentos</h2>
+          <button class="close-button" data-modal-id="medicationStatsModal">&times;</button>
+        </div>
+        <div class="modal-body" style="padding-top: 1.2rem;">
+          <div id="medication-stats-summary" style="margin-bottom:1.2rem;"></div>
+          <div id="medication-stats-chart" style="margin-bottom:1.2rem;"></div>
+          <div id="medication-stats-list" style="margin-bottom:1.2rem;"></div>
+          <div id="medication-stats-recommendations" style="margin-bottom:1.2rem;"></div>
+          <div style="text-align:right;">
+            <button type="button" class="secondary-button close-button" data-modal-id="medicationStatsModal">Cerrar</button>
+            </div>
+        </div>
+                            </div>
+                        </div>
+    <!-- Modal: Estadísticas de Estado de Ánimo -->
+    <div id="moodStatsModal" class="modal">
+      <div class="modal-content large-modal">
+        <div class="modal-header" style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #e6f4f1; padding-bottom: 1rem;">
+          <div style="background: linear-gradient(135deg, #ff9800 60%, #ff5722 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-smile" style="font-size: 2rem; color: #fff;"></i>
+                        </div>
+          <h2 style="margin: 0; color: #ff9800; font-size: 1.3rem;">Estado de Ánimo - Análisis Completo</h2>
+          <button class="close-button" data-modal-id="moodStatsModal">&times;</button>
+        </div>
+        <div class="modal-body" style="padding-top: 1.2rem;">
+          <div id="mood-stats-summary" style="margin-bottom:1.2rem;"></div>
+          <div id="mood-stats-chart" style="margin-bottom:1.2rem;"></div>
+          <div id="mood-stats-trends" style="margin-bottom:1.2rem;"></div>
+          <div id="mood-stats-list" style="margin-bottom:1.2rem;"></div>
+          <div id="mood-stats-recommendations" style="margin-bottom:1.2rem;"></div>
+          <div style="text-align:right;">
+            <button type="button" class="secondary-button close-button" data-modal-id="moodStatsModal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- Modal: Registro y Estadísticas de Sueño -->
+    <div id="sleepStatsModal" class="modal">
+            <div class="modal-content large-modal">
+        <div class="modal-header" style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #e6f4f1; padding-bottom: 1rem;">
+          <div style="background: linear-gradient(135deg, #9c27b0 60%, #673ab7 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-bed" style="font-size: 2rem; color: #fff;"></i>
+                </div>
+          <h2 style="margin: 0; color: #9c27b0; font-size: 1.3rem;">Registro y Análisis de Sueño</h2>
+          <button class="close-button" data-modal-id="sleepStatsModal">&times;</button>
+        </div>
+        <div class="modal-body" style="padding-top: 1.2rem;">
+          <!-- Tabs para alternar entre registro y estadísticas -->
+          <div class="tab-container" style="margin-bottom: 1.5rem;">
+            <button class="tab-button active" data-tab="register">📝 Registrar Sueño</button>
+            <button class="tab-button" data-tab="stats">📊 Estadísticas</button>
+            <button class="tab-button" data-tab="history">📅 Historial</button>
+        </div>
+
+          <!-- Tab: Registrar Sueño -->
+          <div id="register-tab" class="tab-content active">
+            <form id="sleep-register-form" autocomplete="off">
+              <div class="form-row">
+                <div class="form-group floating-label-group" style="flex:1;">
+                  <input type="time" id="sleep-bedtime" class="floating-input" placeholder=" " required>
+                  <label for="sleep-bedtime" class="floating-label">Hora de acostarse *</label>
+                </div>
+                <div class="form-group floating-label-group" style="flex:1;">
+                  <input type="time" id="sleep-waketime" class="floating-input" placeholder=" " required>
+                  <label for="sleep-waketime" class="floating-label">Hora de levantarse *</label>
+                </div>
+                    </div>
+              <div class="form-group">
+                <label for="sleep-quality" style="color:#9c27b0;font-weight:500;">Calidad del sueño: <span id="sleep-quality-value">5</span>/10</label>
+                <input type="range" id="sleep-quality" min="1" max="10" value="5" style="width:100%; accent-color:#9c27b0;">
+                </div>
+              <div class="form-group floating-label-group">
+                <textarea id="sleep-observations" rows="2" class="floating-input" placeholder=" "></textarea>
+                <label for="sleep-observations" class="floating-label">Observaciones</label>
+                    </div>
+              <div class="form-group floating-label-group">
+                <input type="date" id="sleep-date" class="floating-input" placeholder=" ">
+                <label for="sleep-date" class="floating-label">Fecha</label>
+                </div>
+              <div class="modal-actions">
+                <button type="submit" class="primary-button">Guardar Registro</button>
+                <button type="button" class="secondary-button" onclick="switchTab('stats')">Ver Estadísticas</button>
+                </div>
+            </form>
+            </div>
+          
+          <!-- Tab: Estadísticas -->
+          <div id="stats-tab" class="tab-content">
+            <div id="sleep-stats-summary" style="margin-bottom:1.2rem;"></div>
+            <div id="sleep-stats-chart" style="margin-bottom:1.2rem;"></div>
+            <div id="sleep-stats-weekly" style="margin-bottom:1.2rem;"></div>
+            <div id="sleep-stats-recommendations" style="margin-bottom:1.2rem;"></div>
+        </div>
+
+          <!-- Tab: Historial -->
+          <div id="history-tab" class="tab-content">
+            <div id="sleep-history-list" style="margin-bottom:1.2rem;"></div>
+            </div>
+          
+          <div style="text-align:right;">
+            <button type="button" class="secondary-button close-button" data-modal-id="sleepStatsModal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Botón flotante para abrir el MediBot -->
+    <div class="medibot-toggle" id="medibotToggle" role="button" aria-expanded="false" aria-controls="medibotContainer">
+        <i class="fa-solid fa-user-doctor"></i>
+        <span class="notification-badge hidden" id="notificationBadge" aria-live="polite" aria-atomic="true">1</span>
+    </div>
+
+    <!-- Contenedor del MediBot -->
+    <div class="medibot-container" id="medibotContainer" aria-live="polite" aria-atomic="true" role="dialog" aria-labelledby="medibotHeaderTitle">
+        <div class="medibot-header" id="medibotHeader">
+            <div class="header-content">
+                <i class="fas fa-robot"></i>
+                <h2 id="medibotHeaderTitle">MediBot</h2>
+                <span class="connection-status">
+                    <i class="fas fa-circle online-status" aria-hidden="true"></i>
+                    Online
+                </span>
+            </div>
+            <div class="header-controls">
+                <button class="control-btn" id="medibotVoice" aria-label="Activar/Desactivar voz">
+                    <i class="fas fa-volume-up" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotMinimize" aria-label="Minimizar chatbot">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotClose" aria-label="Cerrar chatbot">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="medibot-messages" id="medibotMessages" role="log" aria-live="polite"></div>
+
+        <div class="medibot-quick-actions" id="medibotQuickActions" role="group" aria-label="Acciones rápidas del chatbot"></div>
+
+        <div class="medibot-input-area">
+            <input type="text" class="medibot-input" id="medibotInput" placeholder="Escribe tu mensaje..." aria-label="Escribe tu mensaje">
+            <button class="voice-btn" id="medibotVoiceInput" aria-label="Entrada de voz">
+                <i class="fas fa-microphone" aria-hidden="true"></i>
+            </button>
+            <button class="send-btn" id="medibotSend" aria-label="Enviar mensaje">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+<script>
+// Cargar el sidebar dinámicamente si no existe ya
+        fetch('sidebar/sidebar.html')
+            .then(response => response.text())
+            .then(html => {
+    document.getElementById('sidebar-container').innerHTML = html;
+    });
+</script>
+    <script src="sidebar/sidebar.js"></script>
+    <script src="medibot/medibot.js"></script>
+    <script src="NotasPersonales.js"></script>
+</body>
+</html>

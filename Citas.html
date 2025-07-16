@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Gestión de Citas Médicas</title>
+    <meta name="description" content="Gestiona tus citas médicas de forma inteligente con MediTrack. Agenda, reprograma y organiza tus consultas médicas.">
+    
+    <!-- Skip links para accesibilidad -->
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+    <a href="#navigation" class="skip-link">Saltar a la navegación</a>
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="Estilos/global.css">
+    <link rel="stylesheet" href="Estilos/Citas.css">
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <link rel="stylesheet" href="sidebar/sidebar-responsive.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Preload de recursos críticos -->
+    <link rel="preload" href="Scripts/citas.js" as="script">
+    <link rel="preload" href="sidebar/sidebar.js" as="script">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <!-- MediBot CSS -->
+    <link rel="stylesheet" href="medibot/medibot.css">
+</head>
+<body>
+    <!-- Sidebar/Navbar superior -->
+    <div id="navbarContainer"></div>
+
+    <!-- Contenido Principal -->
+    <main id="main-content" class="main-content">
+        <div class="container">
+        <!-- Header simplificado al estilo de inicio -->
+        <div class="page-header">
+            <div class="breadcrumbs">
+                <a href="Inicio.html">
+                            <i class="fas fa-home"></i>
+                            Inicio
+                        </a>
+                <span class="separator">/</span>
+                <span>Mis Citas</span>
+                    </div>
+
+            <div class="welcome-section">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span class="avatar-initials">ML</span>
+                    </div>
+                    <div class="welcome-text">
+                        <h1>Gestión de Citas Médicas</h1>
+                        <p class="page-subtitle">
+                            Organiza y controla tu agenda médica de forma inteligente
+                        </p>
+                        <p class="motivational-quote">
+                            "La prevención es la mejor medicina"
+                        </p>
+                    </div>
+                </div>
+                <div class="health-status-widget">
+                    <div class="status-indicator" id="appointmentsStatusIndicator">
+                            <i class="fas fa-calendar-check"></i>
+                        <span id="appointmentsStatusText">3 citas próximas</span>
+                        </div>
+                        </div>
+                </div>
+            
+            <!-- Quick Actions simplificadas -->
+            <div class="quick-actions">
+                <button class="btn btn-primary" onclick="openModal('modalNuevaCita')" aria-label="Crear nueva cita médica">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    Nueva Cita
+                </button>
+                <button class="btn btn-secondary" onclick="refreshAppointments()" aria-label="Actualizar lista de citas">
+                    <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                    Actualizar
+                </button>
+                <button class="btn btn-info" onclick="exportAppointments()" aria-label="Exportar citas a archivo CSV">
+                    <i class="fas fa-download" aria-hidden="true"></i>
+                    Exportar CSV
+                    </button>
+            </div>
+        </div>
+
+            <!-- Dashboard de Próxima Cita Destacado -->
+            <section class="next-appointment-hero" id="next-appointment-hero">
+                <div class="hero-content">
+                    <div class="hero-left">
+                        <div class="hero-badge">
+                            <i class="fas fa-clock"></i>
+                            <span>Próxima Cita</span>
+                        </div>
+                        <h2 class="hero-title" id="next-appointment-title">Consulta cardiológica</h2>
+                        <div class="hero-details">
+                            <div class="detail-item">
+                                <i class="fas fa-user-md"></i>
+                                <span id="next-appointment-doctor">Dra. Sofía Restrepo (Cardióloga)</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span id="next-appointment-date">23 Mayo 2025, 14:30</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="next-appointment-location">Clínica Zayma, Consultorio 305, Montería</span>
+                            </div>
+                        </div>
+                        <div class="hero-countdown" id="countdown-container">
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-days">00</span>
+                                <span class="countdown-label">Días</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-hours">00</span>
+                                <span class="countdown-label">Horas</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-minutes">00</span>
+                                <span class="countdown-label">Minutos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-right">
+                        <div class="hero-actions">
+                            <button class="btn btn-secondary" onclick="rescheduleNextAppointment()">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Reprogramar</span>
+                            </button>
+                            <button class="btn btn-outline" onclick="viewNextAppointmentDetails()">
+                                <i class="fas fa-eye"></i>
+                                <span>Ver Detalles</span>
+                            </button>
+                            <button class="btn btn-success" onclick="addToCalendar()">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span>Agregar al Calendario</span>
+                            </button>
+                        </div>
+                        <div class="hero-status">
+                            <div class="status-indicator urgent">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Cita Urgente</span>
+                            </div>
+                            <div class="reminder-status">
+                                <i class="fas fa-bell"></i>
+                                <span>Recordatorio configurado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skeleton Loader para Hero -->
+            <section class="next-appointment-hero skeleton-hero" id="skeleton-hero" style="display: none;">
+                <div class="hero-content">
+                    <div class="hero-left">
+                        <div class="skeleton-badge loading-skeleton"></div>
+                        <div class="skeleton-title loading-skeleton"></div>
+                        <div class="hero-details">
+                            <div class="skeleton-detail loading-skeleton"></div>
+                            <div class="skeleton-detail loading-skeleton"></div>
+                            <div class="skeleton-detail loading-skeleton"></div>
+                        </div>
+                        <div class="hero-countdown">
+                            <div class="skeleton-countdown loading-skeleton"></div>
+                            <div class="skeleton-countdown loading-skeleton"></div>
+                            <div class="skeleton-countdown loading-skeleton"></div>
+                        </div>
+                    </div>
+                    <div class="hero-right">
+                        <div class="skeleton-actions">
+                            <div class="skeleton-btn loading-skeleton"></div>
+                            <div class="skeleton-btn loading-skeleton"></div>
+                            <div class="skeleton-btn loading-skeleton"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard de métricas moderno al estilo de inicio -->
+            <section class="health-stats-section mb-xl">
+                <div class="section-header">
+                    <h2 class="section-title">Resumen de Citas</h2>
+                    <div class="section-actions">
+                        <select class="form-input form-select" id="timeRangeSelector">
+                            <option value="all">Todas</option>
+                            <option value="week">Esta Semana</option>
+                            <option value="month">Este Mes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <!-- Citas Totales -->
+                    <div class="stat-card card animate-fade-in-up" onclick="filterAppointments('all')">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="total-appointments">12</h3>
+                            <p class="stat-label">Citas Totales</p>
+                            <div class="stat-details">
+                                <span class="stat-description">En el último mes</span>
+                                <div class="stat-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+2 este mes</span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Citas Urgentes -->
+                    <div class="stat-card card animate-fade-in-up" onclick="filterAppointments('urgent')">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="urgent-appointments">2</h3>
+                            <p class="stat-label">Citas Urgentes</p>
+                            <div class="stat-details">
+                                <span class="stat-description">Requieren atención inmediata</span>
+                                <div class="stat-trend urgent">
+                                <i class="fas fa-clock"></i>
+                                <span>Requieren atención</span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Citas Completadas -->
+                    <div class="stat-card card animate-fade-in-up" onclick="filterAppointments('completed')">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="completed-appointments">8</h3>
+                            <p class="stat-label">Completadas</p>
+                            <div class="stat-details">
+                                <span class="stat-description">67% de cumplimiento</span>
+                                <div class="stat-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+3 este mes</span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Próximas Citas -->
+                    <div class="stat-card card animate-fade-in-up" onclick="filterAppointments('upcoming')">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="upcoming-appointments">3</h3>
+                            <p class="stat-label">Próximas</p>
+                            <div class="stat-details">
+                                <span class="stat-description">Esta semana</span>
+                                <div class="stat-trend neutral">
+                                <i class="fas fa-calendar"></i>
+                                    <span>Programadas</span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skeleton Loader para Métricas -->
+            <section class="metrics-dashboard" id="skeleton-metrics" style="display: none;">
+                <div class="metrics-grid">
+                    <div class="metric-card skeleton-metric">
+                        <div class="skeleton-icon loading-skeleton"></div>
+                        <div class="metric-content">
+                            <div class="skeleton-number loading-skeleton"></div>
+                            <div class="skeleton-label loading-skeleton"></div>
+                            <div class="skeleton-trend loading-skeleton"></div>
+                        </div>
+                        <div class="skeleton-chart loading-skeleton"></div>
+                    </div>
+                    <div class="metric-card skeleton-metric">
+                        <div class="skeleton-icon loading-skeleton"></div>
+                        <div class="metric-content">
+                            <div class="skeleton-number loading-skeleton"></div>
+                            <div class="skeleton-label loading-skeleton"></div>
+                            <div class="skeleton-trend loading-skeleton"></div>
+                        </div>
+                        <div class="skeleton-chart loading-skeleton"></div>
+                    </div>
+                    <div class="metric-card skeleton-metric">
+                        <div class="skeleton-icon loading-skeleton"></div>
+                        <div class="metric-content">
+                            <div class="skeleton-number loading-skeleton"></div>
+                            <div class="skeleton-label loading-skeleton"></div>
+                            <div class="skeleton-trend loading-skeleton"></div>
+                        </div>
+                        <div class="skeleton-chart loading-skeleton"></div>
+                    </div>
+                    <div class="metric-card skeleton-metric">
+                        <div class="skeleton-icon loading-skeleton"></div>
+                        <div class="metric-content">
+                            <div class="skeleton-number loading-skeleton"></div>
+                            <div class="skeleton-label loading-skeleton"></div>
+                            <div class="skeleton-trend loading-skeleton"></div>
+                        </div>
+                        <div class="skeleton-chart loading-skeleton"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resumen de Citas Recientes y Próximas -->
+            <section class="appointments-summary">
+                <div class="summary-grid">
+                    <div class="summary-card recent">
+                        <div class="summary-header">
+                            <div class="summary-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="summary-title">
+                                <h3>Citas Recientes</h3>
+                                <span class="summary-count">3 completadas</span>
+                            </div>
+                        </div>
+                        <div class="summary-list" id="recent-appointments-list">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                        <div class="summary-footer">
+                            <button class="btn btn-text" onclick="viewAllRecent()">
+                                Ver todas
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="summary-card upcoming">
+                        <div class="summary-header">
+                            <div class="summary-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="summary-title">
+                                <h3>Próximas Citas</h3>
+                                <span class="summary-count">3 programadas</span>
+                            </div>
+                        </div>
+                        <div class="summary-list" id="upcoming-appointments-list">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                        <div class="summary-footer">
+                            <button class="btn btn-text" onclick="viewAllUpcoming()">
+                                Ver todas
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="summary-card doctors">
+                        <div class="summary-header">
+                            <div class="summary-icon">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="summary-title">
+                                <h3>Doctores Frecuentes</h3>
+                                <span class="summary-count">4 contactos</span>
+                            </div>
+                        </div>
+                        <div class="summary-list" id="frequent-doctors-list">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                        <div class="summary-footer">
+                            <button class="btn btn-text" onclick="viewAllDoctors()">
+                                Ver todos
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filtros inteligentes -->
+            <section class="smart-filters">
+                <div class="filters-header">
+                    <div class="filters-title">
+                        <i class="fas fa-filter"></i>
+                        <span>Filtros Inteligentes</span>
+                    </div>
+                    <button class="toggle-filters-btn" id="toggle-filters">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Mostrar filtros</span>
+                    </button>
+                </div>
+                <div class="filters-content" id="filters-content">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="filter-date-range" class="filter-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                Rango de fechas
+                            </label>
+                            <div class="date-range-inputs">
+                                <div class="date-input-wrapper">
+                                    <input type="text" id="filter-date-from" class="datepicker" placeholder="Desde">
+                                    <i class="fas fa-calendar input-icon"></i>
+                                </div>
+                                <div class="date-separator">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div class="date-input-wrapper">
+                                    <input type="text" id="filter-date-to" class="datepicker" placeholder="Hasta">
+                                    <i class="fas fa-calendar input-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="filter-type" class="filter-label">
+                                <i class="fas fa-stethoscope"></i>
+                                Tipo de cita
+                            </label>
+                            <div class="select-wrapper">
+                                <select id="filter-type" class="form-select">
+                                    <option value="all">Todos los tipos</option>
+                                    <option value="general">Consulta general</option>
+                                    <option value="specialist">Especialista</option>
+                                    <option value="test">Pruebas médicas</option>
+                                    <option value="vaccine">Vacunación</option>
+                                    <option value="followup">Seguimiento</option>
+                                    <option value="emergency">Urgencia</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="filter-status" class="filter-label">
+                                <i class="fas fa-info-circle"></i>
+                                Estado
+                            </label>
+                            <div class="select-wrapper">
+                                <select id="filter-status" class="form-select">
+                                    <option value="all">Todos los estados</option>
+                                    <option value="upcoming">Próximas</option>
+                                    <option value="completed">Completadas</option>
+                                    <option value="canceled">Canceladas</option>
+                                    <option value="urgent">Urgentes</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="filter-doctor" class="filter-label">
+                                <i class="fas fa-user-md"></i>
+                                Doctor
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="filter-doctor" class="form-input" placeholder="Buscar doctor...">
+                                <i class="fas fa-search input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filters-actions">
+                        <button class="btn btn-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </button>
+                        <button class="btn btn-primary" onclick="applyFilters()">
+                            <i class="fas fa-filter"></i>
+                            Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendario Interactivo -->
+            <section class="calendar-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="title-content">
+                            <h2>Calendario de Citas</h2>
+                            <span>Visualiza y gestiona todas tus citas</span>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <div class="calendar-controls">
+                            <button class="btn btn-outline" onclick="todayCalendar()">
+                                <i class="fas fa-calendar-day"></i>
+                                Hoy
+                            </button>
+                            <div class="calendar-view-toggle">
+                                <button class="view-toggle-btn active" data-view="dayGridMonth">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Mes
+                                </button>
+                                <button class="view-toggle-btn" data-view="timeGridWeek">
+                                    <i class="fas fa-calendar-week"></i>
+                                    Semana
+                                </button>
+                                <button class="view-toggle-btn" data-view="timeGridDay">
+                                    <i class="fas fa-calendar-day"></i>
+                                    Día
+                                </button>
+                                <button class="view-toggle-btn" data-view="listWeek">
+                                    <i class="fas fa-list"></i>
+                                    Lista
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-filters">
+                        <div class="filter-tags">
+                            <span class="filter-tag active" data-filter="all">
+                                <i class="fas fa-circle"></i>
+                                Todas
+                            </span>
+                            <span class="filter-tag" data-filter="upcoming">
+                                <i class="fas fa-circle" style="color: var(--color-primary)"></i>
+                                Próximas
+                            </span>
+                            <span class="filter-tag" data-filter="urgent">
+                                <i class="fas fa-circle" style="color: var(--color-danger)"></i>
+                                Urgentes
+                            </span>
+                            <span class="filter-tag" data-filter="completed">
+                                <i class="fas fa-circle" style="color: var(--color-success)"></i>
+                                Completadas
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-wrapper">
+                        <div id="fullCalendar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Citas Próximas -->
+            <section class="upcoming-appointments">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2><i class="fas fa-calendar-alt"></i> Citas Próximas</h2>
+                        <span class="badge badge-primary" id="upcoming-count">0</span>
+                    </div>
+                    <div class="section-actions">
+                        <div class="search-box">
+                            <input type="text" id="upcoming-search" placeholder="Buscar citas próximas..." aria-label="Buscar citas próximas">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-toggle-btn active" data-view="carousel" aria-label="Vista de carrusel">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="view-toggle-btn" data-view="list" aria-label="Vista de lista">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearUpcomingFilters()" aria-label="Limpiar filtros">
+                            <i class="fas fa-filter"></i>
+                            Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estado vacío mejorado -->
+                <div class="empty-state enhanced" id="upcoming-empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                                </div>
+                    <h3>No tienes citas próximas</h3>
+                    <p>¡Perfecto! Tu agenda está libre. ¿Necesitas programar una nueva cita médica?</p>
+                    <div class="empty-actions">
+                        <button class="btn btn-primary" onclick="openModal('modalNuevaCita')">
+                            <i class="fas fa-plus"></i>
+                            Crear Nueva Cita
+                                    </button>
+                        <button class="btn btn-secondary" onclick="viewAllRecent()">
+                            <i class="fas fa-history"></i>
+                            Ver Historial
+                                    </button>
+                            </div>
+                        </div>
+
+                <!-- Carrusel de citas próximas -->
+                <div class="appointments-carousel-wrapper" id="upcoming-carousel-wrapper">
+                    <button class="carousel-arrow left" id="carousel-prev" aria-label="Cita anterior">
+                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                    
+                    <div class="appointments-carousel" id="appointments-carousel" role="region" aria-label="Carrusel de citas próximas">
+                        <!-- Las tarjetas se generan dinámicamente -->
+                                </div>
+                    
+                    <button class="carousel-arrow right" id="carousel-next" aria-label="Siguiente cita">
+                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                    
+                    <!-- Indicadores de página -->
+                    <div class="carousel-indicators" id="carousel-indicators" role="tablist" aria-label="Navegación del carrusel"></div>
+                                </div>
+
+                <!-- Vista de lista (oculta por defecto) -->
+                <div class="appointments-list hidden" id="upcoming-list">
+                    <div class="list-header">
+                        <div class="list-column">Tipo</div>
+                        <div class="list-column">Doctor</div>
+                        <div class="list-column">Fecha</div>
+                        <div class="list-column">Hora</div>
+                        <div class="list-column">Estado</div>
+                        <div class="list-column">Acciones</div>
+                            </div>
+                    <div class="list-body" id="upcoming-list-body">
+                        <!-- Los elementos de lista se generan dinámicamente -->
+                        </div>
+                    </div>
+
+                <!-- Estado de carga -->
+                <div class="loading-state" id="upcoming-loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando citas próximas...</p>
+                </div>
+            </section>
+
+            <!-- Historial de citas -->
+            <section class="appointments-history">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-history"></i>
+                        <div class="title-content">
+                            <h2>Historial de Citas</h2>
+                            <span class="appointments-count">8 citas completadas</span>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary" onclick="exportHistory()">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="history-container">
+                    <div class="history-table-container">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <i class="fas fa-calendar"></i>
+                                        Fecha
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-stethoscope"></i>
+                                        Tipo
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-user-md"></i>
+                                        Doctor
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Ubicación
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-info-circle"></i>
+                                        Estado
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-cog"></i>
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>10 Dic 2024, 14:30</td>
+                                    <td>
+                                        <span class="badge badge-primary">Consulta</span>
+                                    </td>
+                                    <td>Dr. Ana Martínez</td>
+                                    <td>Clínica Central</td>
+                                    <td>
+                                        <span class="badge badge-success">Completada</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn-icon" onclick="viewDetails(1)" aria-label="Ver detalles de la cita cardiológica">
+                                            <i class="fas fa-eye" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>05 Dic 2024, 09:15</td>
+                                    <td>
+                                        <span class="badge badge-info">Pruebas</span>
+                                    </td>
+                                    <td>Laboratorio Central</td>
+                                    <td>Centro Médico</td>
+                                    <td>
+                                        <span class="badge badge-success">Completada</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn-icon" onclick="viewDetails(2)" aria-label="Ver detalles de la vacunación antigripal">
+                                            <i class="fas fa-eye" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>01 Dic 2024, 16:00</td>
+                                    <td>
+                                        <span class="badge badge-warning">Especialista</span>
+                                    </td>
+                                    <td>Dr. Luis Pérez</td>
+                                    <td>Hospital General</td>
+                                    <td>
+                                        <span class="badge badge-danger">Cancelada</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn-icon" onclick="viewDetails(3)" aria-label="Ver detalles de la consulta general cancelada">
+                                            <i class="fas fa-eye" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal Nueva Cita -->
+    <div class="modal" id="modalNuevaCita">
+        <div class="modal-overlay"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <div class="modal-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="modal-title-content">
+                        <h3>Nueva Cita</h3>
+                        <span>Programa una nueva cita médica</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeModal('modalNuevaCita')" aria-label="Cerrar modal de nueva cita">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            <!-- Resumen visual de cita (preview) -->
+            <div class="modal-visual-summary animate-fade-in-up" style="display: flex; align-items: center; gap: 1.2rem; background: #e0f7fa; border-radius: 16px; padding: 1rem 1.2rem; margin-bottom: 1.5rem;">
+                <div style="font-size: 2.2rem; color: var(--primary-color);"><i class="fas fa-calendar-plus"></i></div>
+                <div style="flex:1;">
+                    <div style="font-weight: 600; color: var(--primary-dark); font-size: 1.1rem;">¡Agrega tu próxima cita!</div>
+                    <div style="color: var(--text-muted); font-size: 0.98rem;">Completa los datos y recibe recordatorios automáticos.</div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="appointment-form" id="new-appointment-form" autocomplete="off">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="appointment-type" class="form-label">
+                                <i class="fas fa-stethoscope"></i>
+                                Tipo de Cita *
+                            </label>
+                            <div class="select-wrapper">
+                            <select id="appointment-type" class="form-select" required aria-describedby="appointment-type-hint">
+                                <option value="">Seleccionar tipo</option>
+                                <option value="general">Consulta general</option>
+                                <option value="specialist">Especialista</option>
+                                <option value="test">Pruebas médicas</option>
+                                <option value="vaccine">Vacunación</option>
+                                <option value="followup">Seguimiento</option>
+                                <option value="emergency">Urgencia</option>
+                            </select>
+                                <i class="fas fa-chevron-down select-icon" aria-hidden="true"></i>
+                            </div>
+                            <div class="form-hint" id="appointment-type-hint">Selecciona el tipo de atención que necesitas</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-doctor" class="form-label">
+                                <i class="fas fa-user-md"></i>
+                                Doctor *
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="appointment-doctor" class="form-input" placeholder="Buscar doctor..." required autocomplete="off">
+                                <i class="fas fa-search input-icon"></i>
+                                <div class="doctor-suggestions" id="doctor-suggestions">
+                                    <!-- Sugerencias dinámicas -->
+                                </div>
+                            </div>
+                            <div class="form-hint">Escribe el nombre del doctor o especialidad</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-date" class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                Fecha *
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="appointment-date" class="form-input datepicker-modern" placeholder="Seleccionar fecha" required autocomplete="off">
+                                <i class="fas fa-calendar input-icon"></i>
+                            </div>
+                            <div class="form-hint">Selecciona una fecha disponible</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-time" class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Hora *
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="appointment-time" class="form-input timepicker-modern" placeholder="Seleccionar hora" required autocomplete="off">
+                                <i class="fas fa-clock input-icon"></i>
+                            </div>
+                            <div class="form-hint">Horario de atención: 8:00 AM - 6:00 PM</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-location" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Ubicación *
+                            </label>
+                            <div class="select-wrapper">
+                            <select id="appointment-location" class="form-select" required>
+                                <option value="">Seleccionar ubicación</option>
+                                <option value="clinica-central">Clínica Central</option>
+                                <option value="centro-medico">Centro Médico</option>
+                                <option value="hospital-general">Hospital General</option>
+                                <option value="laboratorio">Laboratorio Central</option>
+                            </select>
+                                <i class="fas fa-chevron-down select-icon"></i>
+                            </div>
+                            <div class="form-hint">Selecciona el centro médico</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-urgency" class="form-label">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Prioridad
+                            </label>
+                            <div class="urgency-options">
+                                <label class="urgency-option">
+                                    <input type="radio" name="urgency" value="normal" checked>
+                                    <span class="urgency-label normal">
+                                        <i class="fas fa-circle"></i>
+                                        Normal
+                                    </span>
+                                </label>
+                                <label class="urgency-option">
+                                    <input type="radio" name="urgency" value="urgent">
+                                    <span class="urgency-label urgent">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Urgente
+                                    </span>
+                                </label>
+                                <label class="urgency-option">
+                                    <input type="radio" name="urgency" value="emergency">
+                                    <span class="urgency-label emergency">
+                                        <i class="fas fa-ambulance"></i>
+                                        Emergencia
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment-notes" class="form-label">
+                            <i class="fas fa-notes-medical"></i>
+                            Notas Adicionales
+                        </label>
+                        <textarea id="appointment-notes" class="form-textarea" rows="4" placeholder="Describe los síntomas, motivo de la consulta o información adicional..."></textarea>
+                        <div class="form-hint">Esta información ayudará al doctor a prepararse mejor</div>
+                    </div>
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-bell"></i>
+                            Recordatorios
+                        </h4>
+                        <div class="reminder-options">
+                        <label class="checkbox-label">
+                                <input type="checkbox" id="reminder-24h" checked>
+                            <span class="checkmark"></span>
+                                <span class="checkbox-text">24 horas antes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="reminder-1h">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">1 hora antes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="reminder-15min">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">15 minutos antes</span>
+                        </label>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-link"></i>
+                            Integración
+                        </h4>
+                        <div class="integration-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="add-to-calendar">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Añadir a mi calendario personal</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="share-with-family">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Compartir con familiares</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalNuevaCita')">
+                    Cancelar
+                </button>
+                <button class="btn btn-primary" type="submit" form="new-appointment-form">
+                    <i class="fas fa-save"></i>
+                    Guardar Cita
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cancelar Cita -->
+    <div class="modal" id="modalCancelarCita">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <div class="modal-icon danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="modal-title-content">
+                        <h3>Cancelar Cita</h3>
+                        <span>¿Estás seguro de que quieres cancelar esta cita?</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeModal('modalCancelarCita')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="appointment-details">
+                    <div class="current-appointment-info">
+                        <div class="info-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <div class="info-content">
+                                <h4 id="cancel-appointment-title">Consulta de Urgencia</h4>
+                                <p id="cancel-appointment-details">Dr. María González - Hoy, 15:30</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cancel-warning">
+                        <div class="warning-card">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="warning-content">
+                                <h4>Importante</h4>
+                                <p>Esta acción no se puede deshacer. La cita será cancelada permanentemente.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalCancelarCita')">
+                    Mantener Cita
+                </button>
+                <button class="btn-modern btn-cancel-modern btn-confirm-cancel" onclick="appointmentManager.confirmCancelAppointment()">
+                    <i class="fas fa-times"></i>
+                    <span>Cancelar Cita</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalles de Cita -->
+    <div class="modal" id="modalDetallesCita">
+        <div class="modal-overlay"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <div class="modal-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="modal-title-content">
+                        <h3 id="detail-appointment-title">Detalles de la Cita</h3>
+                        <span id="detail-appointment-subtitle">Información completa de la cita</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeModal('modalDetallesCita')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="appointment-details-container">
+                    <div class="details-grid">
+                        <div class="detail-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-info-circle"></i>
+                                Información General
+                            </h4>
+                            <div class="detail-cards">
+                                <div class="detail-card">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-stethoscope"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <span class="detail-label">Tipo de Cita</span>
+                                        <span class="detail-value" id="detail-type">Consulta cardiológica</span>
+                                    </div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <span class="detail-label">Doctor</span>
+                                        <span class="detail-value" id="detail-doctor">Dra. Sofía Restrepo</span>
+                                        <span class="detail-specialty-label">Especialidad:</span>
+                                        <span class="detail-specialty-value" id="detail-specialty"></span>
+                                    </div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-calendar"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <span class="detail-label">Fecha y Hora</span>
+                                        <span class="detail-value" id="detail-datetime">23 Mayo 2025, 14:30</span>
+                                    </div>
+                                </div>
+                                <div class="detail-card">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <span class="detail-label">Ubicación</span>
+                                        <span class="detail-value" id="detail-location">Clínica Zayma, Consultorio 305</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-notes-medical"></i>
+                                Notas y Preparación
+                            </h4>
+                            <div class="notes-container">
+                                <div class="notes-content" id="detail-notes">
+                                    Llevar resultados de electrocardiograma y análisis recientes. 
+                                    Ayunas de 8 horas si se requieren análisis adicionales.
+                                </div>
+                                <div class="notes-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="editNotes()">
+                                        <i class="fas fa-edit"></i>
+                                        Editar Notas
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" onclick="addToMedicalHistory()">
+                                        <i class="fas fa-plus"></i>
+                                        Añadir al Historial
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-bell"></i>
+                                Recordatorios
+                            </h4>
+                            <div class="reminders-list" id="detail-reminders">
+                                <div class="reminder-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>24 horas antes - 22 Mayo 2025, 14:30</span>
+                                </div>
+                                <div class="reminder-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>1 hora antes - 23 Mayo 2025, 13:30</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-cog"></i>
+                                Acciones
+                            </h4>
+                            <div class="actions-grid">
+                                <button class="action-btn" onclick="rescheduleAppointment()">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Reprogramar</span>
+                                </button>
+                                <button class="action-btn" onclick="addToCalendar()">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <span>Añadir a Calendario</span>
+                                </button>
+                                <button class="action-btn" onclick="shareAppointment()">
+                                    <i class="fas fa-share"></i>
+                                    <span>Compartir</span>
+                                </button>
+                                <button class="action-btn danger" onclick="cancelAppointment()">
+                                    <i class="fas fa-times"></i>
+                                    <span>Cancelar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalDetallesCita')">
+                    Cerrar
+                </button>
+                <button class="btn btn-primary" onclick="editAppointment()">
+                    <i class="fas fa-edit"></i>
+                    Editar Cita
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MediBot CSS -->
+    <link rel="stylesheet" href="medibot/medibot.css">
+
+    <!-- MediBot HTML Structure -->
+    <div id="medibotContainer" class="medibot-container">
+        <div id="medibotHeader" class="medibot-header">
+            <div class="header-content">
+                <i class="fas fa-user-md"></i>
+                <h2>MediBot</h2>
+                <div class="connection-status">
+                    <span class="online-status">●</span>
+                    <span>En línea</span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button id="medibotVoice" class="control-btn" title="Activar/Desactivar voz">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button id="medibotMinimize" class="control-btn" title="Minimizar">
+                    <i class="fas fa-minus"></i>
+    </button>
+                <button id="medibotClose" class="control-btn" title="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div id="medibotMessages" class="medibot-messages"></div>
+        <div id="medibotQuickActions" class="medibot-quick-actions"></div>
+        <div class="medibot-input-area">
+            <input type="text" id="medibotInput" class="medibot-input" placeholder="Escribe tu mensaje..." maxlength="500">
+            <button id="medibotVoiceInput" class="voice-btn" title="Usar voz">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button id="medibotSend" class="send-btn" title="Enviar">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    <!-- Botón flotante para abrir el MediBot -->
+    <button id="medibotToggle" class="medibot-toggle" aria-expanded="false" title="Abrir MediBot">
+        <i class="fas fa-user-md"></i>
+        <span id="notificationBadge" class="notification-badge hidden">0</span>
+    </button>
+    <!-- MediBot JavaScript -->
+    <script src="medibot/medibot.js"></script>
+
+    <!-- Scripts -->
+    <script src="Scripts/citas.js"></script>
+    <script src="sidebar/sidebar.js"></script>
+</body>
+</html>

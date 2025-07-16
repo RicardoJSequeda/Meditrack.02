@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Emergencia</title>
+    <link rel="stylesheet" href="Estilos/global.css">
+    <link rel="stylesheet" href="Estilos/emergencia.css">
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <link rel="stylesheet" href="sidebar/sidebar-responsive.css">
+    <link rel="stylesheet" href="medibot/medibot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <!-- Sidebar/Navbar superior -->
+    <div id="navbarContainer"></div>
+    
+    <!-- Banner de Emergencia -->
+    <div id="emergency-alert-banner" class="emergency-alert-banner" style="display: none;">
+        <div class="banner-content">
+            <i class="fas fa-exclamation-triangle banner-icon"></i>
+            <span>🚨 EMERGENCIA ACTIVA - La ayuda está en camino</span>
+        </div>
+    </div>
+        
+    <main class="main-content">
+        <div class="container">
+        <!-- Header simplificado al estilo de inicio -->
+        <div class="page-header">
+            <div class="breadcrumbs">
+                <a href="Inicio.html">
+                            <i class="fas fa-home"></i>
+                            Inicio
+                        </a>
+                <span class="separator">/</span>
+                <span>Emergencia</span>
+                    </div>
+
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h1>Modo Emergencia</h1>
+                    <p class="page-subtitle">
+                        Acceso rápido a servicios de emergencia y contactos de apoyo
+                    </p>
+                    <p class="motivational-quote">
+                        "En emergencias, cada segundo cuenta"
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Quick Actions simplificadas -->
+            <div class="quick-actions">
+                    <button class="btn btn-danger" id="activate-emergency">
+                        <i class="fas fa-bell"></i>
+                    Activar Emergencia
+                </button>
+                <button class="btn btn-secondary" onclick="shareLocationNow()">
+                    <i class="fas fa-crosshairs"></i>
+                    Compartir Ubicación
+                </button>
+                <button class="btn btn-info" onclick="alertContacts()">
+                    <i class="fas fa-users"></i>
+                    Alertar Contactos
+                    </button>
+            </div>
+        </div>
+
+        <!-- Emergency Alert Banner -->
+        <div class="emergency-alert-banner" id="emergency-alert-banner" style="display: none;">
+                <div class="alert-content">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                <div class="alert-text">
+                    <h3>Emergencia Activa</h3>
+                    <p>El sistema de emergencia está activo. La ayuda está en camino.</p>
+                </div>
+                <div class="alert-timer">
+                    <span id="emergency-banner-timer">00:00:00</span>
+                </div>
+                <button class="alert-close" onclick="cancelEmergency()">
+                    <i class="fas fa-times"></i>
+                </button>
+                </div>
+            </div>
+            <!-- Estado del Sistema de Emergencia -->
+            <section class="system-status-dashboard">
+                <h2 class="section-title">Estado del Sistema de Emergencia</h2>
+                <div class="status-cards-grid" id="system-status-cards">
+                    <!-- Las tarjetas de estado se renderizan dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Tarjetas de Acciones Rápidas de Emergencia -->
+            <section class="quick-actions-cards-section mb-xl">
+                <h2 class="section-title">Acciones de Emergencia</h2>
+                <div class="quick-cards-grid">
+                    <!-- Llamada de Emergencia -->
+                    <div class="quick-card card emergency-card" id="emergencyCallCard">
+                        <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                            <div class="card-title">
+                                <h3>Llamada de Emergencia</h3>
+                                <span class="card-subtitle">123 - Emergencias</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="emergency-info">
+                                <p class="emergency-description">Servicio de emergencias nacional</p>
+                                <p class="emergency-time">Disponible 24/7</p>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-danger btn-sm" onclick="callEmergencyWithConfirmation()">
+                                    <i class="fas fa-phone"></i>
+                                    Llamar Ahora
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="showEmergencyInfo()">
+                                    <i class="fas fa-info-circle"></i>
+                                    Más Info
+                        </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hospitales Cercanos -->
+                    <div class="quick-card card" id="nearbyHospitalsCard">
+                        <div class="card-header">
+                        <div class="card-icon">
+                                <i class="fas fa-hospital"></i>
+                        </div>
+                            <div class="card-title">
+                                <h3>Hospitales Cercanos</h3>
+                                <span class="card-subtitle" id="hospitalsCount">3 disponibles</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="hospitals-info">
+                                <p class="hospitals-description">Centros médicos más cercanos</p>
+                                <p class="hospitals-distance" id="nearestHospital">Clínica Montería - 2.3 km</p>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary btn-sm" onclick="showNearbyHospitals()">
+                                    <i class="fas fa-map"></i>
+                                    Ver Mapa
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="callNearestHospital()">
+                                    <i class="fas fa-phone"></i>
+                                    Llamar
+                        </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información Médica -->
+                    <div class="quick-card card" id="medicalInfoCard">
+                        <div class="card-header">
+                        <div class="card-icon">
+                                <i class="fas fa-file-medical-alt"></i>
+                        </div>
+                            <div class="card-title">
+                                <h3>Info Médica</h3>
+                                <span class="card-subtitle" id="medicalInfoCount">3 condiciones</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="medical-info">
+                                <p class="medical-description">Información médica crítica</p>
+                                <p class="medical-conditions" id="medicalConditions">Diabetes, Alergias</p>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-info btn-sm" onclick="showMedicalInfo()">
+                                    <i class="fas fa-eye"></i>
+                                    Ver Detalles
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HERO SECTION - EMERGENCY CALL -->
+            <section class="hero-emergency">
+                <div class="hero-background">
+                    <div class="hero-pattern"></div>
+                    <div class="hero-overlay"></div>
+                        </div>
+                <div class="hero-content">
+                    <div class="hero-icon">
+                        <div class="icon-container">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="hero-text">
+                        <h1 class="hero-title">Emergencia Médica</h1>
+                        <p class="hero-subtitle">Acceso inmediato a servicios de emergencia y asistencia médica</p>
+                    </div>
+                    <div class="hero-actions">
+                        <!-- Botón principal de emergencia - Más prominente -->
+                        <button class="btn-emergency-primary" id="emergency-call-btn" onclick="callEmergencyWithConfirmation()">
+                            <div class="btn-content">
+                                <i class="fas fa-phone-alt"></i>
+                                <div class="btn-text">
+                                    <span class="btn-main">LLAMAR EMERGENCIA</span>
+                                    <span class="btn-number">123</span>
+                                </div>
+                            </div>
+                            <div class="btn-pulse"></div>
+                        </button>
+                        
+                        <!-- Acciones secundarias rápidas -->
+                        <div class="hero-secondary-actions">
+                            <button class="btn-secondary-action" onclick="shareLocationNow()" title="Compartir ubicación">
+                                <i class="fas fa-crosshairs"></i>
+                                <span>Ubicación</span>
+                            </button>
+                            <button class="btn-secondary-action" onclick="alertContacts()" title="Alertar contactos">
+                                <i class="fas fa-users"></i>
+                                <span>Contactos</span>
+                            </button>
+                            <button class="btn-secondary-action" onclick="showMedicalInfo()" title="Información médica">
+                                <i class="fas fa-file-medical-alt"></i>
+                                <span>Info Médica</span>
+                            </button>
+                        </div>
+                        
+                        <div class="emergency-status">
+                            <div class="status-indicator">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Sistema de emergencia activo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DASHBOARD DE ESTADO CRÍTICO -->
+            <!--
+            <section class="critical-status-dashboard">
+                <div class="status-grid">
+                    <div class="status-card location-status">...</div>
+                    <div class="status-card contacts-status">...</div>
+                    <div class="status-card medical-status">...</div>
+                    <div class="status-card emergency-status">...</div>
+                </div>
+            </section>
+            -->
+
+            <!-- QUICK ACTIONS DASHBOARD -->
+            <section class="quick-actions-dashboard">
+                <div class="dashboard-header">
+                    <div class="header-content">
+                        <h2 class="dashboard-title">Acciones Rápidas</h2>
+                        <p class="dashboard-subtitle">Funciones esenciales para situaciones de emergencia</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-refresh" onclick="refreshAllData()" title="Actualizar todos los datos">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="actions-grid">
+                    <!-- Acciones Críticas -->
+                    <div class="action-card critical" onclick="shareLocationNow()">
+                        <div class="card-header">
+                        <div class="card-icon">
+                                <i class="fas fa-crosshairs"></i>
+                        </div>
+                            <div class="card-badge critical">Crítico</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Compartir Ubicación</h3>
+                            <p>Envía tu ubicación exacta a servicios de emergencia y contactos</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="action-hint">Toca para compartir ahora</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="action-card critical" onclick="alertContacts()">
+                        <div class="card-header">
+                        <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                        </div>
+                            <div class="card-badge critical">Crítico</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Alertar Contactos</h3>
+                            <p>Notifica inmediatamente a tus contactos de emergencia</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="action-hint">Toca para alertar</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Importantes -->
+                    <div class="action-card important" onclick="showMedicalInfo()">
+                        <div class="card-header">
+                        <div class="card-icon">
+                                <i class="fas fa-file-medical-alt"></i>
+                        </div>
+                            <div class="card-badge important">Importante</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Información Médica</h3>
+                            <p>Muestra datos críticos para el personal de emergencia</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="action-hint">Toca para mostrar</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="action-card important" onclick="showFirstAid()">
+                        <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-first-aid"></i>
+                        </div>
+                            <div class="card-badge important">Importante</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Primeros Auxilios</h3>
+                            <p>Guías básicas para situaciones de emergencia</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="action-hint">Toca para ver guías</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EMERGENCY CONTACTS -->
+            <section class="emergency-contacts-modern">
+                <div class="section-header-modern">
+                    <div class="header-info">
+                        <div class="header-icon">
+                        <i class="fas fa-address-book"></i>
+                        </div>
+                        <div class="header-text">
+                            <h2>Contactos de Emergencia</h2>
+                            <p>Personas que serán notificadas en caso de emergencia</p>
+                        </div>
+                    </div>
+                    <div class="header-controls">
+                        <button class="btn-modern secondary" onclick="editEmergencyContacts()">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="contacts-container">
+                    <div class="contact-card primary-contact">
+                        <div class="contact-header">
+                            <div class="contact-avatar">
+                                <div class="avatar-circle">
+                                    <span>AM</span>
+                                </div>
+                                <div class="contact-status">
+                                    <div class="status-dot online"></div>
+                                    <span>Disponible</span>
+                                </div>
+                            </div>
+                            <div class="contact-badge primary">
+                            <i class="fas fa-star"></i>
+                                <span>Principal</span>
+                        </div>
+                        </div>
+                        
+                            <div class="contact-details">
+                            <h3 class="contact-name">Ana María Rodríguez</h3>
+                            <p class="contact-relation">Hermana</p>
+                            <div class="contact-phone">
+                                <i class="fas fa-phone"></i>
+                                <span>+57 310 123 4567</span>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-actions">
+                            <button class="action-btn call" onclick="callContact('+573101234567', 'Ana María')">
+                                <i class="fas fa-phone"></i>
+                                <span>Llamar</span>
+                            </button>
+                            <button class="action-btn message" onclick="sendSMSToContact('+573101234567', 'Ana María')">
+                                <i class="fas fa-comment"></i>
+                                <span>Mensaje</span>
+                            </button>
+                            <button class="action-btn location" onclick="sendLocationToContact('+573101234567', 'Ana María')">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Ubicación</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="contact-card secondary-contact">
+                        <div class="contact-header">
+                            <div class="contact-avatar">
+                                <div class="avatar-circle">
+                                    <span>JC</span>
+                        </div>
+                                <div class="contact-status">
+                                    <div class="status-dot offline"></div>
+                                    <span>Última vez hace 2h</span>
+                                </div>
+                            </div>
+                            <div class="contact-badge secondary">
+                                <span>Secundario</span>
+                            </div>
+                        </div>
+                        
+                            <div class="contact-details">
+                            <h3 class="contact-name">Juan Carlos Gómez</h3>
+                            <p class="contact-relation">Amigo Cercano</p>
+                            <div class="contact-phone">
+                                <i class="fas fa-phone"></i>
+                                <span>+57 300 987 6543</span>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-actions">
+                            <button class="action-btn call" onclick="callContact('+573009876543', 'Juan Carlos')">
+                                <i class="fas fa-phone"></i>
+                                <span>Llamar</span>
+                            </button>
+                            <button class="action-btn message" onclick="sendSMSToContact('+573009876543', 'Juan Carlos')">
+                                <i class="fas fa-comment"></i>
+                                <span>Mensaje</span>
+                            </button>
+                            <button class="action-btn location" onclick="sendLocationToContact('+573009876543', 'Juan Carlos')">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Ubicación</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOCATION TRACKING -->
+            <section class="location-tracking-modern">
+                <div class="section-header-modern">
+                    <div class="header-info">
+                        <div class="header-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div class="header-text">
+                            <h2>Seguimiento de Ubicación</h2>
+                            <p>Tu ubicación actual y herramientas de navegación</p>
+                        </div>
+                    </div>
+                    <div class="header-controls">
+                        <button class="btn-modern secondary" onclick="refreshLocation()">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Actualizar</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="location-dashboard">
+                    <div class="location-info-panel">
+                        <div class="location-header-modern">
+                            <div class="location-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                            <div class="location-title">
+                                <h3>Ubicación Actual</h3>
+                                <div class="location-status-modern" id="location-status">
+                                    <div class="status-indicator-modern">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Conectado</span>
+                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="location-details-modern">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-map"></i>
+                                    <span>Dirección</span>
+                                </div>
+                                <div class="detail-value" id="current-address">
+                                    Carrera 4 # 30-50, Centro, Montería, Córdoba, Colombia
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Coordenadas</span>
+                                </div>
+                                <div class="detail-value coordinates" id="current-coordinates">
+                                    Lat: 8.7500, Long: -75.8833
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Última actualización</span>
+                                </div>
+                                <div class="detail-value" id="location-timestamp">
+                                    Hace 5 minutos
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="location-actions-modern">
+                            <button class="action-btn-modern primary" onclick="copyLocation()">
+                                <i class="fas fa-copy"></i>
+                                <span>Copiar</span>
+                            </button>
+                            <button class="action-btn-modern secondary" onclick="shareLocation()">
+                                <i class="fas fa-share-alt"></i>
+                                <span>Compartir</span>
+                            </button>
+                            <button class="action-btn-modern tertiary" onclick="centerOnMyLocation()">
+                                <i class="fas fa-crosshairs"></i>
+                                <span>Centrar</span>
+                        </button>
+                    </div>
+                </div>
+                    
+                    <div class="map-panel">
+                        <div class="map-header">
+                            <h4>Mapa Interactivo</h4>
+                            <div class="map-controls">
+                                <button class="map-btn" onclick="toggleMapView()">
+                                    <i class="fas fa-layer-group"></i>
+                                </button>
+                                <button class="map-btn" onclick="centerOnMyLocation()">
+                                    <i class="fas fa-crosshairs"></i>
+                        </button>
+                            </div>
+                        </div>
+                        <div class="map-container-modern">
+                            <div id="map"></div>
+                            <div class="map-overlay-modern">
+                                <div class="map-info">
+                                    <span class="map-coordinates" id="map-coordinates">8.7500, -75.8833</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- QUÉ HACER MIENTRAS LLEGA LA AYUDA -->
+            <section class="while-waiting-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Qué hacer mientras llega la ayuda
+                    </h2>
+                </div>
+                
+                <div class="while-waiting-grid">
+                    <div class="guidance-card">
+                        <div class="guidance-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Mantén la calma</h3>
+                        <p>Respira profundamente y mantén la tranquilidad. La ayuda está en camino.</p>
+                    </div>
+                    
+                    <div class="guidance-card">
+                        <div class="guidance-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3>No muevas al herido</h3>
+                        <p>A menos que sea absolutamente necesario por peligro inminente.</p>
+                    </div>
+                    
+                    <div class="guidance-card">
+                        <div class="guidance-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <h3>Mantén la temperatura</h3>
+                        <p>Cubre con una manta si es necesario para evitar hipotermia.</p>
+                    </div>
+                    
+                    <div class="guidance-card">
+                        <div class="guidance-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h3>Observa signos vitales</h3>
+                        <p>Verifica respiración y consciencia cada 30 segundos.</p>
+                    </div>
+                    
+                    <div class="guidance-card">
+                        <div class="guidance-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3>Mantén el teléfono cerca</h3>
+                        <p>Para recibir llamadas de emergencia o actualizaciones.</p>
+                    </div>
+                    
+                    <div class="guidance-card">
+                        <div class="guidance-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3>Prepara información</h3>
+                        <p>Tén lista tu información médica para el personal de emergencia.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MEDICAL FACILITIES -->
+            <section class="medical-facilities-modern">
+                <div class="section-header-modern">
+                    <div class="header-info">
+                        <div class="header-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="header-text">
+                            <h2>Instalaciones Médicas</h2>
+                            <p>Hospitales y farmacias cercanas a tu ubicación</p>
+                    </div>
+                </div>
+                    <div class="header-controls">
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" data-filter="all">
+                                <span>Todos</span>
+                            </button>
+                            <button class="filter-tab" data-filter="hospitals">
+                                <i class="fas fa-hospital"></i>
+                                <span>Hospitales</span>
+                            </button>
+                            <button class="filter-tab" data-filter="pharmacies">
+                                <i class="fas fa-pills"></i>
+                                <span>Farmacias</span>
+                        </button>
+                    </div>
+                        </div>
+                    </div>
+
+                <div class="facilities-grid-modern">
+                    <div class="facility-card-modern hospital" data-type="hospital">
+                        <div class="facility-header-modern">
+                            <div class="facility-icon-modern">
+                                <i class="fas fa-hospital"></i>
+                        </div>
+                            <div class="facility-info-modern">
+                                <h3 class="facility-name-modern">Hospital Universitario</h3>
+                                <div class="facility-meta-modern">
+                                    <span class="distance-modern">1.2 km</span>
+                                    <div class="status-badge available">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Disponible</span>
+                        </div>
+                                </div>
+                        </div>
+                    </div>
+
+                        <div class="facility-details-modern">
+                            <div class="detail-row">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Calle 15 # 23-45, Centro</span>
+                        </div>
+                            <div class="detail-row">
+                                <i class="fas fa-phone"></i>
+                                <span>+57 4 789 0123</span>
+                            </div>
+                            <div class="detail-row">
+                                <i class="fas fa-clock"></i>
+                                <span>24/7 - Emergencias</span>
+                            </div>
+                            <div class="detail-row">
+                                <i class="fas fa-stethoscope"></i>
+                                <span>Emergencias, UCI, Cirugía</span>
+                            </div>
+                        </div>
+                        
+                        <div class="facility-actions-modern">
+                            <button class="action-btn-modern primary" onclick="callFacility('+5747890123', 'Hospital Universitario')">
+                                <i class="fas fa-phone"></i>
+                                <span>Llamar</span>
+                            </button>
+                            <button class="action-btn-modern secondary" onclick="getDirections('Hospital Universitario', 'Calle 15 # 23-45, Centro')">
+                                <i class="fas fa-route"></i>
+                                <span>Ruta</span>
+                        </button>
+                    </div>
+                </div>
+
+                    <div class="facility-card-modern hospital" data-type="hospital">
+                        <div class="facility-header-modern">
+                            <div class="facility-icon-modern">
+                        <i class="fas fa-hospital"></i>
+                            </div>
+                            <div class="facility-info-modern">
+                                <h3 class="facility-name-modern">Clínica San José</h3>
+                                <div class="facility-meta-modern">
+                                    <span class="distance-modern">2.8 km</span>
+                                    <div class="status-badge busy">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Ocupado</span>
+                                    </div>
+                        </div>
+                    </div>
+                </div>
+                
+                        <div class="facility-details-modern">
+                            <div class="detail-row">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Carrera 8 # 12-34, Norte</span>
+                            </div>
+                            <div class="detail-row">
+                                <i class="fas fa-phone"></i>
+                                <span>+57 4 456 7890</span>
+                        </div>
+                            <div class="detail-row">
+                                <i class="fas fa-clock"></i>
+                                <span>24/7 - Emergencias</span>
+                        </div>
+                            <div class="detail-row">
+                                <i class="fas fa-stethoscope"></i>
+                                <span>Emergencias, Pediatría</span>
+                        </div>
+                    </div>
+
+                        <div class="facility-actions-modern">
+                            <button class="action-btn-modern primary" onclick="callFacility('+5744567890', 'Clínica San José')">
+                                <i class="fas fa-phone"></i>
+                                <span>Llamar</span>
+                            </button>
+                            <button class="action-btn-modern secondary" onclick="getDirections('Clínica San José', 'Carrera 8 # 12-34, Norte')">
+                                <i class="fas fa-route"></i>
+                                <span>Ruta</span>
+                            </button>
+                            </div>
+                        </div>
+
+                    <div class="facility-card-modern pharmacy" data-type="pharmacy">
+                        <div class="facility-header-modern">
+                            <div class="facility-icon-modern">
+                                <i class="fas fa-pills"></i>
+                        </div>
+                            <div class="facility-info-modern">
+                                <h3 class="facility-name-modern">Farmacia 24 Horas</h3>
+                                <div class="facility-meta-modern">
+                                    <span class="distance-modern">0.8 km</span>
+                                    <div class="status-badge available">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Abierta</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="facility-details-modern">
+                            <div class="detail-row">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Calle 10 # 15-20, Centro</span>
+                            </div>
+                            <div class="detail-row">
+                                <i class="fas fa-phone"></i>
+                                <span>+57 4 123 4567</span>
+                            </div>
+                            <div class="detail-row">
+                                <i class="fas fa-clock"></i>
+                                <span>24/7 - Siempre abierta</span>
+                            </div>
+                            <div class="detail-row">
+                                <i class="fas fa-pills"></i>
+                                <span>Medicamentos, Primeros auxilios</span>
+                            </div>
+                        </div>
+                        
+                        <div class="facility-actions-modern">
+                            <button class="action-btn-modern primary" onclick="callFacility('+5741234567', 'Farmacia 24 Horas')">
+                                <i class="fas fa-phone"></i>
+                                <span>Llamar</span>
+                            </button>
+                            <button class="action-btn-modern secondary" onclick="getDirections('Farmacia 24 Horas', 'Calle 10 # 15-20, Centro')">
+                                <i class="fas fa-route"></i>
+                                <span>Ruta</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal de emergencia -->
+    <div class="modal" id="emergency-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <div class="modal-icon danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="modal-title-content">
+                        <h3>¡EMERGENCIA ACTIVADA!</h3>
+                        <span>Se están notificando tus contactos</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeModal('emergency-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="emergency-countdown">
+                    <p>Los servicios de emergencia serán contactados en:</p>
+                    <span id="countdown-timer">30</span> segundos
+                </div>
+                <p>Se ha enviado tu ubicación y mensaje de emergencia a todos tus contactos configurados.</p>
+                <p>Si es una emergencia médica, se contactará automáticamente al 123.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cancelEmergency()">
+                    Cancelar Emergencia
+                </button>
+                <button class="btn btn-danger" onclick="confirmEmergency()">
+                    Confirmar Emergencia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Información Médica -->
+    <div id="medical-info-modal" class="medical-info-modal medical-info">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-file-medical-alt"></i>
+                </div>
+                <h3>Información Médica de Emergencia</h3>
+                <p class="modal-subtitle">Datos críticos para personal de emergencia</p>
+            </div>
+            <div class="modal-body" id="medical-info-view">
+                <div class="medical-info-list">
+                    <div class="info-row"><span class="info-label">Nombre:</span> <span class="info-value" id="medinfo-nombre">Juan Carlos Pérez</span></div>
+                    <div class="info-row"><span class="info-label">Edad:</span> <span class="info-value" id="medinfo-edad">32 años</span></div>
+                    <div class="info-row"><span class="info-label">Tipo de sangre:</span> <span class="info-value" id="medinfo-sangre">O+</span></div>
+                    <div class="info-row"><span class="info-label">Alergias:</span> <span class="info-value" id="medinfo-alergias">Penicilina, Mariscos</span></div>
+                    <div class="info-row"><span class="info-label">Condiciones:</span> <span class="info-value" id="medinfo-condiciones">Diabetes, Asma</span></div>
+                    <div class="info-row"><span class="info-label">Medicamentos:</span> <span class="info-value" id="medinfo-medicamentos">Metformina, Salbutamol</span></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn primary" onclick="showMedicalEditForm()">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="modal-btn secondary" onclick="hideModal('medical-info-modal')">
+                        <i class="fas fa-times"></i> Cerrar
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" id="medical-info-edit" style="display:none;">
+                <form id="medical-edit-form" class="medical-edit-form" onsubmit="saveMedicalInfo(event)">
+                    <div class="form-group">
+                        <label for="edit-nombre">Nombre</label>
+                        <input type="text" id="edit-nombre" name="nombre" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-edad">Edad</label>
+                        <input type="number" id="edit-edad" name="edad" required min="0" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-sangre">Tipo de sangre</label>
+                        <input type="text" id="edit-sangre" name="sangre" required maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-alergias">Alergias</label>
+                        <input type="text" id="edit-alergias" name="alergias" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-condiciones">Condiciones</label>
+                        <input type="text" id="edit-condiciones" name="condiciones" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-medicamentos">Medicamentos</label>
+                        <input type="text" id="edit-medicamentos" name="medicamentos" maxlength="100">
+                    </div>
+                    <div class="modal-actions">
+                        <button class="modal-btn success" type="submit">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                        <button class="modal-btn secondary" type="button" onclick="cancelMedicalEdit()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Primeros Auxilios -->
+    <div id="first-aid-modal" class="first-aid-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h3>Guía de Primeros Auxilios</h3>
+                <p class="modal-subtitle">Procedimientos básicos de emergencia</p>
+            </div>
+            <div class="modal-body">
+                <div class="first-aid-list">
+                    <div class="aid-row">
+                        <div class="aid-title">RCP (Reanimación Cardiopulmonar)</div>
+                        <ol class="aid-steps">
+                            <li>Verificar consciencia y respiración</li>
+                            <li>Llamar a emergencias (123)</li>
+                            <li>Iniciar compresiones torácicas (30 compresiones)</li>
+                            <li>Dar 2 respiraciones de rescate</li>
+                            <li>Repetir ciclo hasta que llegue ayuda</li>
+                        </ol>
+                    </div>
+                    <div class="aid-row">
+                        <div class="aid-title">Hemorragias</div>
+                        <ol class="aid-steps">
+                            <li>Aplicar presión directa sobre la herida</li>
+                            <li>Elevar la zona afectada si es posible</li>
+                            <li>No retirar objetos incrustados</li>
+                            <li>Buscar atención médica urgente</li>
+                        </ol>
+                    </div>
+                    <div class="aid-row">
+                        <div class="aid-title">Quemaduras</div>
+                        <ol class="aid-steps">
+                            <li>Enfriar la zona con agua (10-20 min)</li>
+                            <li>No aplicar cremas ni hielo</li>
+                            <li>Cubrir con gasa estéril</li>
+                            <li>No reventar ampollas</li>
+                            <li>Buscar atención médica si es grave</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="hideModal('first-aid-modal')">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="Scripts/emergencia.js"></script>
+    <script src="sidebar/sidebar.js"></script>
+
+    <!-- MediBot para emergencias -->
+    <div class="medibot-toggle" id="medibotToggle" role="button" aria-expanded="false" aria-controls="medibotContainer">
+        <i class="fa-solid fa-user-doctor"></i>
+        <span class="notification-badge hidden" id="notificationBadge" aria-live="polite" aria-atomic="true">1</span>
+        </div>
+    <div class="medibot-container" id="medibotContainer" aria-live="polite" aria-atomic="true" role="dialog" aria-labelledby="medibotHeaderTitle">
+        <div class="medibot-header" id="medibotHeader">
+            <div class="header-content">
+                    <i class="fas fa-robot"></i>
+                <h2 id="medibotHeaderTitle">MediBot</h2>
+                <span class="connection-status">
+                    <i class="fas fa-circle online-status" aria-hidden="true"></i>
+                    Online
+                </span>
+                </div>
+            <div class="header-controls">
+                <button class="control-btn" id="medibotVoice" aria-label="Activar/Desactivar voz">
+                    <i class="fas fa-volume-up" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotMinimize" aria-label="Minimizar chatbot">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotClose" aria-label="Cerrar chatbot">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+        <div class="medibot-messages" id="medibotMessages" role="log" aria-live="polite"></div>
+        <div class="medibot-quick-actions" id="medibotQuickActions" role="group" aria-label="Acciones rápidas del chatbot"></div>
+        <div class="medibot-input-area">
+            <input type="text" class="medibot-input" id="medibotInput" placeholder="Escribe tu mensaje..." aria-label="Escribe tu mensaje">
+            <button class="voice-btn" id="medibotVoiceInput" aria-label="Entrada de voz">
+                <i class="fas fa-microphone" aria-hidden="true"></i>
+            </button>
+            <button class="send-btn" id="medibotSend" aria-label="Enviar mensaje">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    <script src="medibot/medibot.js"></script>
+
+    <!-- MODALES DE EMERGENCIA -->
+    
+    <!-- Modal de Confirmación de Emergencia -->
+    <div id="emergency-confirmation-modal" class="emergency-modal emergency-confirmation">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Confirmar Llamada de Emergencia</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que necesitas llamar a los servicios de emergencia? Esta acción iniciará una llamada inmediata al número 123.</p>
+                
+                <div class="emergency-info">
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Hora: <span id="emergency-time"></span></span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Ubicación: <span id="emergency-location"></span></span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <span>Usuario: <span id="emergency-user"></span></span>
+                    </div>
+                </div>
+                
+                <div class="emergency-actions">
+                    <button class="btn-confirm-emergency" onclick="confirmEmergencyCall()">
+                        <i class="fas fa-phone"></i>
+                        <span>Confirmar Llamada</span>
+                    </button>
+                    <button class="btn-cancel-emergency" onclick="cancelEmergencyCall()">
+                        <i class="fas fa-times"></i>
+                        <span>Cancelar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Alerta de Contactos de Emergencia -->
+    <div id="contact-alert-modal" class="contact-alert-modal contact-alert">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Alertar Contactos de Emergencia</h3>
+            </div>
+            <div class="modal-body">
+                <p>Se enviará una alerta a todos tus contactos de emergencia con tu ubicación actual.</p>
+                <div class="contacts-list" id="alert-contacts-list">
+                    <!-- Los contactos se cargarán dinámicamente aquí -->
+                </div>
+            </div>
+            <div class="alert-actions">
+                <button class="btn-send-alert" onclick="sendAlertToContacts()">
+                    <i class="fas fa-paper-plane"></i> Enviar Alertas
+                </button>
+                <button class="btn-cancel-alert" onclick="cancelContactAlert()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Llamada a Instalación -->
+    <div id="facility-call-modal" class="facility-call-modal facility-call">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h3>Llamar Instalación</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Deseas llamar a esta instalación médica?</p>
+                
+                <div class="facility-info">
+                    <div class="info-item">
+                        <i class="fas fa-hospital"></i>
+                        <span>Instalación: <span class="facility-name"></span></span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <span>Teléfono: <span class="facility-phone"></span></span>
+                    </div>
+                </div>
+                
+                <div class="call-actions">
+                    <button class="btn-call-facility" onclick="confirmFacilityCall()">
+                        <i class="fas fa-phone"></i>
+                        <span>Llamar</span>
+                    </button>
+                    <button class="btn-cancel-call" onclick="cancelFacilityCall()">
+                        <i class="fas fa-times"></i>
+                        <span>Cancelar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edición de Contactos de Emergencia -->
+    <div id="edit-contacts-modal" class="emergency-modal">
+        <div class="modal-content contacts-edit-modal">
+            <div class="modal-header">
+                <div class="header-top">
+                    <h3 class="modal-title">Editar Contactos de Emergencia</h3>
+                    <div class="contacts-counter" id="contacts-counter">0/3</div>
+                </div>
+                <p class="modal-subtitle">Gestiona las personas que serán notificadas en emergencias (máximo 3 contactos)</p>
+            </div>
+            <div class="modal-body">
+                <div class="contacts-list" id="contacts-list" style="max-height: 350px; overflow-y: auto;">
+                    <!-- Los contactos se cargarán dinámicamente aquí -->
+                </div>
+                <div class="add-contact-section">
+                    <button class="btn-add-contact" onclick="showAddContactForm()">
+                        <i class="fas fa-plus"></i>
+                        <span>Agregar Nuevo Contacto</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <div class="actions-right">
+                    <button class="modal-btn secondary" onclick="hideModal('edit-contacts-modal')">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button class="modal-btn primary" onclick="showAddContactForm()" id="add-contact-btn">
+                        <i class="fas fa-plus"></i>
+                        Agregar Contacto
+                    </button>
+                    <button class="modal-btn success" onclick="saveEmergencyContacts()">
+                        <i class="fas fa-save"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Contacto Individual -->
+    <div id="contact-form-modal" class="emergency-modal">
+        <div class="modal-content contact-form-modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="contact-form-title">Agregar Contacto</h3>
+                <p class="modal-subtitle">Completa la información del contacto de emergencia</p>
+            </div>
+            <div class="modal-body">
+                <form id="contact-form" class="contact-form">
+                    <div class="form-group">
+                        <label for="contact-name">Nombre Completo *</label>
+                        <input type="text" id="contact-name" name="name" required 
+                               placeholder="Ej: Ana María Rodríguez" maxlength="50">
+                        <div class="validation-message" id="name-validation"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-relation">Relación *</label>
+                        <select id="contact-relation" name="relation" required>
+                            <option value="">Selecciona una relación</option>
+                            <option value="Familiar">Familiar</option>
+                            <option value="Hermano/a">Hermano/a</option>
+                            <option value="Padre">Padre</option>
+                            <option value="Madre">Madre</option>
+                            <option value="Hijo/a">Hijo/a</option>
+                            <option value="Cónyuge">Cónyuge</option>
+                            <option value="Amigo/a">Amigo/a</option>
+                            <option value="Vecino/a">Vecino/a</option>
+                            <option value="Compañero/a de trabajo">Compañero/a de trabajo</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <div class="validation-message" id="relation-validation"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-phone">Número de Teléfono *</label>
+                        <input type="tel" id="contact-phone" name="phone" required 
+                               placeholder="Ej: +57 310 123 4567" maxlength="20">
+                        <div class="validation-message" id="phone-validation"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-email">Correo Electrónico (Opcional)</label>
+                        <input type="email" id="contact-email" name="email" 
+                               placeholder="Ej: ana.rodriguez@email.com" maxlength="100">
+                        <div class="validation-message" id="email-validation"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-type">Tipo de Contacto *</label>
+                        <select id="contact-type" name="type" required>
+                            <option value="">Selecciona el tipo</option>
+                            <option value="primary">Principal (Primera opción)</option>
+                            <option value="secondary">Secundario (Respaldo)</option>
+                        </select>
+                        <div class="validation-message" id="type-validation"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-notes">Notas Adicionales (Opcional)</label>
+                        <textarea id="contact-notes" name="notes" 
+                                  placeholder="Información adicional sobre el contacto..." 
+                                  maxlength="200" rows="3"></textarea>
+                        <div class="validation-message" id="notes-validation"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="hideModal('contact-form-modal')">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="modal-btn primary" onclick="saveContact()">
+                    <i class="fas fa-save"></i>
+                    Guardar Contacto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Fallback para Compartir Ubicación -->
+    <div id="location-share-fallback" class="emergency-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Compartir Ubicación</h3>
+                <p class="modal-subtitle">Copia la información de ubicación</p>
+            </div>
+            <div class="modal-body">
+                <div class="modal-info-item">
+                    <div class="modal-info-icon location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="modal-info-content">
+                        <div class="modal-info-label">Ubicación Actual</div>
+                        <div class="modal-info-value location-display">Obteniendo ubicación...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="hideModal('location-share-fallback')">
+                    <i class="fas fa-times"></i>
+                    Cerrar
+                </button>
+                <button class="modal-btn primary" onclick="copyLocationFromModal()">
+                    <i class="fas fa-copy"></i>
+                    Copiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicador de Llamada -->
+    <div id="calling-indicator" class="calling-indicator">
+        <div class="calling-content">
+            <div class="calling-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="calling-text">
+                <h4>Llamando...</h4>
+                <p>123</p>
+            </div>
+            <div class="calling-animation">
+                <div class="pulse-ring"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicador de Carga -->
+    <div id="loading-indicator" class="loading-indicator">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <span>Actualizando...</span>
+        </div>
+    </div>
+
+    <!-- Modales de Fallback -->
+    
+    <!-- Fallback para llamada de emergencia -->
+    <div id="emergency-fallback" class="emergency-fallback">
+        <div class="fallback-content">
+            <div class="fallback-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="fallback-text">
+                <h4>Llamar a Emergencias</h4>
+                <p>No se pudo iniciar la llamada automáticamente. Por favor, llama manualmente al número de emergencias.</p>
+            </div>
+            <div class="emergency-number-display">
+                <span class="number">123</span>
+                <button class="btn-copy-number" onclick="copyToClipboard('123')">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <button class="btn-close-modal" onclick="hideAllModals()">
+                <i class="fas fa-times"></i>
+                <span>Cerrar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fallback para llamada a instalación -->
+    <div id="facility-call-fallback" class="facility-call-fallback">
+        <div class="fallback-content">
+            <div class="fallback-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="fallback-text">
+                <h4>Llamar Instalación</h4>
+                <p>No se pudo iniciar la llamada automáticamente. Por favor, llama manualmente.</p>
+            </div>
+            <div class="phone-number-display">
+                <span class="number" id="facility-phone-number"></span>
+                <button class="btn-copy-number" onclick="copyToClipboard(document.getElementById('facility-phone-number').textContent)">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <button class="btn-close-modal" onclick="hideAllModals()">
+                <i class="fas fa-times"></i>
+                <span>Cerrar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fallback para llamada a contacto -->
+    <div id="contact-call-fallback" class="contact-call-fallback">
+        <div class="fallback-content">
+            <div class="fallback-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="fallback-text">
+                <h4>Llamar Contacto</h4>
+                <p>No se pudo iniciar la llamada automáticamente. Por favor, llama manualmente.</p>
+            </div>
+            <div class="phone-number-display">
+                <span class="contact-name"></span>
+                <span class="number"></span>
+                <button class="btn-copy-number" onclick="copyToClipboard(this.previousElementSibling.textContent)">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <button class="btn-close-modal" onclick="hideAllModals()">
+                <i class="fas fa-times"></i>
+                <span>Cerrar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fallback para SMS a contacto -->
+    <div id="contact-sms-fallback" class="contact-sms-fallback">
+        <div class="fallback-content">
+            <div class="fallback-icon">
+                <i class="fas fa-comment"></i>
+            </div>
+            <div class="fallback-text">
+                <h4>Enviar SMS</h4>
+                <p>No se pudo enviar el SMS automáticamente. Copia el mensaje y envíalo manualmente.</p>
+            </div>
+            <div class="phone-number-display">
+                <span class="contact-name"></span>
+                <span class="number"></span>
+            </div>
+            <div class="message-display">
+                <span class="message"></span>
+                <button class="btn-copy-message" onclick="copyToClipboard(this.previousElementSibling.textContent)">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <button class="btn-close-modal" onclick="hideAllModals()">
+                <i class="fas fa-times"></i>
+                <span>Cerrar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fallback para ubicación a contacto -->
+    <div id="contact-location-fallback" class="contact-location-fallback">
+        <div class="fallback-content">
+            <div class="fallback-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="fallback-text">
+                <h4>Compartir Ubicación</h4>
+                <p>No se pudo compartir la ubicación automáticamente. Copia la información y compártela manualmente.</p>
+            </div>
+            <div class="phone-number-display">
+                <span class="contact-name"></span>
+                <span class="number"></span>
+            </div>
+            <div class="message-display">
+                <span class="location-text"></span>
+                <button class="btn-copy-message" onclick="copyToClipboard(this.previousElementSibling.textContent)">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <button class="btn-close-modal" onclick="hideAllModals()">
+                <i class="fas fa-times"></i>
+                <span>Cerrar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fallback para compartir ubicación -->
+    <div id="location-share-fallback" class="location-share-fallback">
+        <div class="fallback-content">
+            <div class="fallback-icon">
+                <i class="fas fa-share-alt"></i>
+            </div>
+            <div class="fallback-text">
+                <h4>Compartir Ubicación</h4>
+                <p>No se pudo compartir la ubicación automáticamente. Copia la información y compártela manualmente.</p>
+            </div>
+            <div class="message-display">
+                <span class="location-display"></span>
+                <button class="btn-copy-message" onclick="copyToClipboard(this.previousElementSibling.textContent)">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <button class="btn-close-modal" onclick="hideAllModals()">
+                <i class="fas fa-times"></i>
+                <span>Cerrar</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

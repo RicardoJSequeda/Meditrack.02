@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Dashboard Principal</title>
+    
+    <!-- CSS Global - SIEMPRE PRIMERO -->
+    <link rel="stylesheet" href="Estilos/global.css">
+    
+    <!-- CSS específico de la página -->
+    <link rel="stylesheet" href="Estilos/inicio.css">
+    
+    <!-- Sidebar CSS -->
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <!-- Sidebar Responsive CSS -->
+    <link rel="stylesheet" href="sidebar/sidebar-responsive.css">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+/* MODALES MEJORADOS */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(30,41,59,0.25);
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s;
+  overflow-y: auto;
+}
+.modal.show {
+  display: flex;
+  animation: fadeIn 0.3s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(38,166,154,0.13);
+  max-width: 420px;
+  width: 95vw;
+  margin: 2em auto;
+  padding: 2em 1.5em 1.5em 1.5em;
+  position: relative;
+  animation: scaleIn 0.3s;
+}
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (max-width: 600px) {
+  .modal-content {
+    padding: 1.2em 0.5em 1em 0.5em;
+    max-width: 98vw;
+  }
+}
+.modal-header h2 {
+  font-size: 1.3em;
+  color: #00897b;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #aaa;
+  position: absolute;
+  top: 1em; right: 1em;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modal-close:hover { color: #26a69a; }
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1em;
+  margin-top: 1.5em;
+}
+.form-modern .form-input:invalid {
+  border: 1.5px solid #f44336;
+  background: #fff0f0;
+}
+.form-modern .form-input:valid {
+  border: 1.5px solid #26a69a;
+}
+.form-modern .form-input:focus:invalid {
+  border: 2px solid #f44336;
+}
+.form-modern .form-error {
+  color: #f44336;
+  font-size: 0.98em;
+  margin-bottom: 0.7em;
+  display: none;
+}
+.form-modern .form-error.show {
+  display: block;
+  animation: shake 0.2s;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+.medicionesResumen .empty-msg { color: #888; text-align: center; margin: 2em 0; }
+.medicion-card { position: relative; padding: 1.2em 1.2em 1.2em 1em; border-radius: 14px; box-shadow: 0 2px 10px rgba(38,166,154,0.08); background: #fff; display: flex; align-items: center; gap: 1.2em; min-width: 0; }
+.medicion-card .stat-icon { flex-shrink: 0; font-size: 2.2em; color: #26a69a; background: #e0f7fa; border-radius: 50%; width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; }
+.medicion-card .stat-content { flex: 1; min-width: 0; }
+.medicion-card .stat-number { font-size: 1.5em; font-weight: 700; color: #00897b; margin-bottom: 0.1em; }
+.medicion-card .stat-label { font-size: 1.15em; font-weight: 600; color: #222; margin-bottom: 0.2em; letter-spacing: 0.01em; }
+.medicion-card .stat-details { margin-top: 0.2em; }
+.medicion-card .stat-description { font-size: 1.08em; color: #475569; font-weight: 500; }
+.delete-btn { position: absolute; top: 0.7em; right: 0.7em; background: none; border: none; color: #f44336; font-size: 1.3em; cursor: pointer; transition: color 0.2s; }
+.delete-btn:hover { color: #b71c1c; }
+@media (max-width: 600px) {
+  .medicion-card { flex-direction: column; align-items: flex-start; padding: 1em; }
+  .medicion-card .stat-icon { font-size: 1.7em; width: 40px; height: 40px; }
+  .medicion-card .stat-number { font-size: 1.15em; }
+  .medicion-card .stat-label { font-size: 1em; }
+  .medicion-card .stat-description { font-size: 0.98em; }
+}
+.adherencia-header {
+  background: linear-gradient(90deg, #26a69a 0%, #4db6ac 100%);
+  color: #fff;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  padding-bottom: 0.7em;
+  margin-bottom: 1.2em;
+}
+.adherencia-icon { font-size: 2.5em; background: #fff; color: #26a69a; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(38,166,154,0.13); }
+.adherencia-badges { margin-top: 0.2em; }
+.badge { display: inline-block; padding: 0.3em 0.9em; border-radius: 12px; font-size: 1em; font-weight: 600; margin-right: 0.5em; }
+.badge-success { background: #e0f7fa; color: #00897b; }
+.badge-info { background: #e3f2fd; color: #1976d2; }
+.badge-primary { background: #ede7f6; color: #512da8; }
+.adherencia-table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+.adherencia-table th, .adherencia-table td { padding: 0.5em 0.7em; text-align: center; font-size: 1.08em; }
+.adherencia-table th { background: #f8fafc; color: #00897b; }
+.adherencia-table tr:nth-child(even) { background: #f1f5f9; }
+.adherencia-extra { margin: 1em 0 0.5em 0; font-size: 1.08em; color: #00897b; display: flex; gap: 2em; flex-wrap: wrap; }
+.adherencia-grafico { width: 100%; max-width: 420px; margin: 0 auto; }
+.adherencia-mensaje { margin: 1.2em 0 0.7em 0; font-size: 1.15em; color: #388e3c; display: flex; align-items: center; gap: 0.5em; font-weight: 600; }
+.adherencia-recomendaciones h4 { color: #00897b; margin-top: 1.2em; }
+.adherencia-recomendaciones ul { margin: 0.5em 0 0.5em 1.2em; }
+.adherencia-recomendaciones li { font-size: 1.08em; margin-bottom: 0.3em; display: flex; align-items: center; gap: 0.5em; }
+.presion-header {
+  background: linear-gradient(90deg, #f44336 0%, #26a69a 100%);
+  color: #fff;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  padding-bottom: 0.7em;
+  margin-bottom: 1.2em;
+}
+.presion-icon { font-size: 2.5em; background: #fff; color: #f44336; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(244,67,54,0.13); }
+.presion-badges { margin-top: 0.2em; }
+.presion-table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+.presion-table th, .presion-table td { padding: 0.5em 0.7em; text-align: center; font-size: 1.08em; }
+.presion-table th { background: #f8fafc; color: #f44336; }
+.presion-table tr:nth-child(even) { background: #f1f5f9; }
+.presion-extra { margin: 1em 0 0.5em 0; font-size: 1.08em; color: #f44336; display: flex; gap: 2em; flex-wrap: wrap; }
+.presion-grafico { width: 100%; max-width: 420px; margin: 0 auto; }
+.presion-mensaje { margin: 1.2em 0 0.7em 0; font-size: 1.15em; color: #388e3c; display: flex; align-items: center; gap: 0.5em; font-weight: 600; }
+.presion-recomendaciones h4 { color: #f44336; margin-top: 1.2em; }
+.presion-recomendaciones ul { margin: 0.5em 0 0.5em 1.2em; }
+.presion-recomendaciones li { font-size: 1.08em; margin-bottom: 0.3em; display: flex; align-items: center; gap: 0.5em; }
+.actividad-header {
+  background: linear-gradient(90deg, #1976d2 0%, #26a69a 100%);
+  color: #fff;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  padding-bottom: 0.7em;
+  margin-bottom: 1.2em;
+}
+.actividad-icon { font-size: 2.5em; background: #fff; color: #1976d2; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(25,118,210,0.13); }
+.actividad-badges { margin-top: 0.2em; }
+.actividad-table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+.actividad-table th, .actividad-table td { padding: 0.5em 0.7em; text-align: center; font-size: 1.08em; }
+.actividad-table th { background: #f8fafc; color: #1976d2; }
+.actividad-table tr:nth-child(even) { background: #f1f5f9; }
+.actividad-extra { margin: 1em 0 0.5em 0; font-size: 1.08em; color: #1976d2; display: flex; gap: 2em; flex-wrap: wrap; }
+.actividad-grafico { width: 100%; max-width: 420px; margin: 0 auto; }
+.actividad-mensaje { margin: 1.2em 0 0.7em 0; font-size: 1.15em; color: #388e3c; display: flex; align-items: center; gap: 0.5em; font-weight: 600; }
+.actividad-recomendaciones h4 { color: #1976d2; margin-top: 1.2em; }
+.actividad-recomendaciones ul { margin: 0.5em 0 0.5em 1.2em; }
+.actividad-recomendaciones li { font-size: 1.08em; margin-bottom: 0.3em; display: flex; align-items: center; gap: 0.5em; }
+</style>
+</head>
+<body>
+    <!-- Contenedor del navbar superior -->
+    <div id="navbarContainer"></div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+        <!-- Contenido Principal -->
+        <div class="container">
+            <!-- Header de Página Moderno -->
+            <div class="page-header">
+                <div class="breadcrumbs">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        Inicio
+                    </a>
+                    <span class="separator">/</span>
+                    <span>Dashboard</span>
+                </div>
+
+                <div class="welcome-section">
+                    <div class="user-info">
+                        <div class="welcome-text">
+                            <h1 id="welcomeTitle">¡Hola, María López!</h1>
+                            <p class="page-subtitle" id="welcomeSubtitle">
+                                Aquí tienes tu resumen de salud para hoy
+                            </p>
+                            <p class="motivational-quote" id="motivationalQuote">
+                                "Cada día es una nueva oportunidad para cuidar tu salud"
+                            </p>
+                        </div>
+                    </div>
+                    <div class="health-status-widget">
+                        <div class="status-indicator" id="healthStatusIndicator">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="healthStatusText">Todo bajo control</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions en el header -->
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="openModal('modalAgregarMedicion')">
+                        <i class="fas fa-plus"></i>
+                        Agregar Medición
+                    </button>
+                    <button class="btn btn-secondary" onclick="openModal('modalProgramarCita')">
+                        <i class="fas fa-calendar-plus"></i>
+                        Programar Cita
+                    </button>
+                    <button class="btn btn-info" onclick="openModal('modalReportes')">
+                        <i class="fas fa-chart-bar"></i>
+                        Ver Reportes
+                    </button>
+                </div>
+            </div>
+            <!-- Sección de Estadísticas de Salud -->
+            <section class="health-stats-section mb-xl">
+                <div class="section-header">
+                    <h2 class="section-title">Resumen de Salud</h2>
+                    <div class="section-actions">
+                        <select class="form-input form-select" id="timeRangeSelector">
+                            <option value="today">Hoy</option>
+                            <option value="week">Esta Semana</option>
+                            <option value="month">Este Mes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="medicionesResumen" class="stats-grid"></div>
+            </section>
+
+
+
+            <!-- Mini-Resúmenes Gráficos (Dashboard) -->
+            <section class="mini-graphs-section mb-xl">
+                <h2 class="section-title">Resumen Visual</h2>
+                <div class="graphs-grid">
+                    <!-- Adherencia a Medicación (Gráfico de Dona) -->
+                    <div class="graph-card card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-percentage"></i>
+                                Adherencia a Medicación
+                            </h3>
+                            <span class="period-label">Última semana</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="graph-container">
+                                <canvas id="adherenceChart" width="200" height="200"></canvas>
+                                <div class="graph-overlay">
+                                    <span class="percentage" id="adherencePercentage">95%</span>
+                                    <span class="label">Completada</span>
+                                </div>
+                            </div>
+                            <div class="graph-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="openModal('modalAdherenciaDetallada')">
+                                    Ver informe detallado
+                    </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tendencia de Signos Vitales (Mini-Línea) -->
+                    <div class="graph-card card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-heartbeat"></i>
+                                Presión Arterial
+                            </h3>
+                            <span class="period-label">Últimos 7 días</span>
+            </div>
+                        <div class="card-body">
+                            <div class="graph-container">
+                                <canvas id="bloodPressureChart" width="300" height="150"></canvas>
+                            </div>
+                            <div class="vital-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Promedio</span>
+                                    <span class="stat-value" id="avgBloodPressure">120/80</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Tendencia</span>
+                                    <span class="stat-value positive" id="bloodPressureTrend">
+                                        <i class="fas fa-arrow-down"></i> -5%
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="graph-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="openModal('modalPresionDetalle')">
+                                    Ver todos los registros
+                    </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actividad Semanal (Barra/Área) -->
+                    <div class="graph-card card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                            <i class="fas fa-running"></i>
+                                Actividad Física
+                            </h3>
+                            <span class="period-label">Esta semana</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="graph-container">
+                                <canvas id="activityChart" width="300" height="150"></canvas>
+                            </div>
+                            <div class="activity-summary">
+                              <div class="steps-highlight">
+                                <div class="steps-icon"><i class="fas fa-shoe-prints"></i></div>
+                                <div class="steps-info">
+                                  <span class="steps-label">Total de pasos</span>
+                                  <span class="steps-value" id="totalSteps">42,500</span>
+                                </div>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">Objetivo</span>
+                                    <span class="summary-value" id="stepGoal">50,000</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="stepProgress" style="width: 85%;"></div>
+                                </div>
+                            </div>
+                            <div class="graph-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="navigateToPage('ConsejosSalud.html')">
+                                    Ver mis objetivos
+                    </button>
+                                <!-- En la tarjeta de Actividad Física -->
+                                <button class="btn btn-secondary btn-sm" onclick="openModal('modalActividadDetalle')">
+                                    Ver todos los registros
+                    </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard de Métricas Avanzadas -->
+            <section class="advanced-metrics-section mb-xl">
+                <div class="section-header">
+                    <h2 class="section-title">Dashboard de Métricas Avanzadas</h2>
+                    <div class="section-actions">
+                        <select class="form-input form-select" id="timeRangeSelector">
+                            <option value="7">Últimos 7 días</option>
+                            <option value="30">Últimos 30 días</option>
+                            <option value="90">Últimos 3 meses</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <!-- Tendencias de Salud -->
+                    <div class="metric-card card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Tendencias de Salud
+                            </h3>
+                            <button class="btn btn-secondary btn-sm" onclick="openModal('modalTendenciasDetalladas')">
+                                Ver detalles
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="trends-container">
+                                <div class="trend-item positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span class="trend-label">Presión Arterial</span>
+                                    <span class="trend-value">-5%</span>
+                                </div>
+                                <div class="trend-item positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span class="trend-label">Peso</span>
+                                    <span class="trend-value">-2.3kg</span>
+                                </div>
+                                <div class="trend-item negative">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span class="trend-label">Actividad Física</span>
+                                    <span class="trend-value">-8%</span>
+                                </div>
+                                <div class="trend-item positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span class="trend-label">Calidad del Sueño</span>
+                                    <span class="trend-value">+12%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas Inteligentes -->
+                    <div class="metric-card card smart-alerts-card">
+                      <div class="card-header smart-alerts-header">
+                        <div class="smart-alerts-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="card-title">
+                          <h3>Alertas Inteligentes</h3>
+                            <span class="badge badge-danger">3</span>
+                        </div>
+                                    </div>
+                      <div class="card-body smart-alerts-body">
+                        <div class="smart-alert-list">
+                          <div class="smart-alert-item alert-high animate-alert">
+                            <div class="smart-alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="smart-alert-info">
+                              <div class="smart-alert-title">Glucosa elevada</div>
+                              <div class="smart-alert-desc">Tu glucosa está por encima del rango recomendado. <span class="badge badge-danger">Alta prioridad</span></div>
+                              <div class="smart-alert-meta"><i class="fas fa-clock"></i> Hace 1 hora</div>
+                                </div>
+                                    </div>
+                          <div class="smart-alert-item alert-medium animate-alert">
+                            <div class="smart-alert-icon"><i class="fas fa-heartbeat"></i></div>
+                            <div class="smart-alert-info">
+                              <div class="smart-alert-title">Presión arterial en aumento</div>
+                              <div class="smart-alert-desc">Se detectó una tendencia ascendente en tus últimas mediciones. <span class="badge badge-warning">Media</span></div>
+                              <div class="smart-alert-meta"><i class="fas fa-clock"></i> Hace 3 horas</div>
+                                </div>
+                                    </div>
+                          <div class="smart-alert-item alert-info animate-alert">
+                            <div class="smart-alert-icon"><i class="fas fa-running"></i></div>
+                            <div class="smart-alert-info">
+                              <div class="smart-alert-title">Actividad física baja</div>
+                              <div class="smart-alert-desc">No has alcanzado tu objetivo de pasos esta semana. <span class="badge badge-info">Info</span></div>
+                              <div class="smart-alert-meta"><i class="fas fa-clock"></i> Hoy</div>
+                                </div>
+                          </div>
+                        </div>
+                        <div class="smart-alerts-actions">
+                          <button class="btn btn-secondary btn-sm" onclick="viewAllSmartAlerts()">
+                            Ver todas las alertas
+                          </button>
+                            </div>
+                </div>
+            </div>
+
+                    <!-- Predicciones de Salud -->
+                    <div class="metric-card card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-crystal-ball"></i>
+                                Predicciones de Salud
+                            </h3>
+                            <button class="btn btn-secondary btn-sm" onclick="openModal('modalPrediccionesDetalladas')">
+                                Ver análisis
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="predictions-container">
+                                <div class="prediction-item">
+                                    <div class="prediction-header">
+                                        <span class="prediction-title">Riesgo de Hipertensión</span>
+                                        <span class="badge badge-success">Bajo</span>
+                                    </div>
+                                    <div class="prediction-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 25%;"></div>
+                                        </div>
+                                        <span class="prediction-percentage">25%</span>
+                                    </div>
+                                </div>
+                                <div class="prediction-item">
+                                    <div class="prediction-header">
+                                        <span class="prediction-title">Riesgo de Diabetes</span>
+                                        <span class="badge badge-warning">Medio</span>
+                                    </div>
+                                    <div class="prediction-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 60%;"></div>
+                                        </div>
+                                        <span class="prediction-percentage">60%</span>
+                                    </div>
+                                </div>
+                                <div class="prediction-item">
+                                    <div class="prediction-header">
+                                        <span class="prediction-title">Salud Cardiovascular</span>
+                                        <span class="badge badge-success">Excelente</span>
+                                    </div>
+                                    <div class="prediction-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 85%;"></div>
+                                        </div>
+                                        <span class="prediction-percentage">85%</span>
+                                    </div>
+                </div>
+                            </div>
+                        </div>
+            </div>
+                </div>
+            </section>
+
+            <!-- Calendario de Salud -->
+            <section class="health-calendar-section mb-xl">
+                <div class="section-header">
+                    <h2 class="section-title">Calendario de Salud</h2>
+                    <div class="section-actions">
+                        <!-- Se eliminaron los botones Agregar Evento y Sincronizar -->
+                    </div>
+                </div>
+                
+                <div class="calendar-container card">
+                    <div class="card-body">
+                        <div class="calendar-header">
+                            <button id="prevMonthBtn" class="btn btn-secondary btn-sm"><i class="fas fa-chevron-left"></i></button>
+                            <button id="btnToday" class="btn-today" onclick="mediTrackApp.goToToday()">Hoy</button>
+                            <h3 id="currentMonth">Mayo 2025</h3>
+                            <button id="nextMonthBtn" class="btn btn-secondary btn-sm"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        
+                        <div class="calendar-view-toggle">
+                            <!-- Se eliminaron los botones de vista Mes, Semana y Día -->
+            </div>
+                        
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Los días se generarán dinámicamente con JavaScript -->
+    </div>
+
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-color appointment"></span>
+                                <span>Citas Médicas</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color medication"></span>
+                                <span>Medicamentos</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color symptoms"></span>
+                                <span>Síntomas</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color exercise"></span>
+                                <span>Ejercicio</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color tests"></span>
+                                <span>Pruebas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Comunicación Médica -->
+            <section class="medical-communication-section mb-xl">
+                <div class="section-header">
+                    <h2 class="section-title">Comunicación Médica</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary btn-sm" onclick="openModal('modalNuevoMensaje')">
+                            <i class="fas fa-plus"></i>
+                            Nuevo Mensaje
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="openModal('modalCompartirInformes')">
+                            <i class="fas fa-share"></i>
+                            Compartir Informes
+                        </button>
+                    </div>
+                </div>
+
+                <div class="communication-grid">
+                    <!-- Chat con Médicos -->
+                    <div class="communication-card card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-comments"></i>
+                                Chat con Médicos
+                            </h3>
+                            <span class="badge badge-danger">2</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Barra de búsqueda y filtros -->
+                            <div class="chat-controls">
+                                <div class="search-container">
+                                    <input type="text" id="chatSearch" placeholder="Buscar médico..." class="chat-search-input">
+                                    <i class="fas fa-search search-icon"></i>
+                                </div>
+                                <div class="chat-filters">
+                                    <select id="specialtyFilter" class="filter-select">
+                                        <option value="">Todas las especialidades</option>
+                                        <option value="cardiologia">Cardiología</option>
+                                        <option value="general">Medicina General</option>
+                                        <option value="oftalmologia">Oftalmología</option>
+                                        <option value="dermatologia">Dermatología</option>
+                                    </select>
+                                    <button class="filter-btn" id="onlineFilter" title="Solo médicos en línea">
+                                        <i class="fas fa-circle online-indicator"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="chat-list" id="chatList">
+                                <div class="chat-item unread" data-specialty="cardiologia" data-online="true" data-doctor-id="dra-garcia">
+                                    <div class="chat-avatar" style="background: linear-gradient(135deg, #26a69a, #4db6ac);">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=mariaGarcia&backgroundColor=26a69a,4db6ac&mouth=smile&style=circle" alt="Dra. García" class="doctor-avatar-img">
+                                        <div class="online-status" title="En línea"></div>
+                                    </div>
+                                    <div class="chat-content">
+                                        <div class="chat-header">
+                                            <div class="chat-info">
+                                                <span class="chat-name">Dra. María García</span>
+                                                <span class="chat-specialty">Cardióloga</span>
+                                            </div>
+                                            <div class="chat-meta">
+                                            <span class="chat-time">10:30 AM</span>
+                                                <span class="unread-badge">1</span>
+                                        </div>
+                                    </div>
+                                        <div class="chat-message">
+                                            <div class="message-bubble">
+                                                <p>Hola, ¿cómo te sientes con la nueva medicación?</p>
+                                </div>
+                                        </div>
+                                    </div>
+                                    <div class="chat-actions">
+                                        <button class="action-btn" title="Ver chat completo" onclick="openChatHistory('dra-garcia')">
+                                            <i class="fas fa-comments"></i>
+                                        </button>
+                                        <button class="action-btn" title="Llamar" onclick="callDoctor('dra-garcia')">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                        <button class="action-btn" title="Agendar cita" onclick="scheduleAppointment('dra-garcia')">
+                                            <i class="fas fa-calendar-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="chat-item unread" data-specialty="general" data-online="false" data-doctor-id="dr-martinez">
+                                    <div class="chat-avatar" style="background: linear-gradient(135deg, #1976d2, #42a5f5);">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=carlosMartinez&backgroundColor=1976d2,42a5f5&mouth=smile&style=circle" alt="Dr. Martínez" class="doctor-avatar-img">
+                                        <div class="offline-status" title="Desconectado"></div>
+                                    </div>
+                                    <div class="chat-content">
+                                        <div class="chat-header">
+                                            <div class="chat-info">
+                                                <span class="chat-name">Dr. Carlos Martínez</span>
+                                                <span class="chat-specialty">Médico General</span>
+                                            </div>
+                                            <div class="chat-meta">
+                                            <span class="chat-time">Ayer</span>
+                                                <span class="unread-badge">1</span>
+                                        </div>
+                                    </div>
+                                        <div class="chat-message">
+                                            <div class="message-bubble">
+                                                <p>Los resultados de tus análisis están listos. ¿Puedes pasar a recogerlos?</p>
+                                </div>
+                                        </div>
+                                    </div>
+                                    <div class="chat-actions">
+                                        <button class="action-btn" title="Ver chat completo" onclick="openChatHistory('dr-martinez')">
+                                            <i class="fas fa-comments"></i>
+                                        </button>
+                                        <button class="action-btn" title="Llamar" onclick="callDoctor('dr-martinez')">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                        <button class="action-btn" title="Agendar cita" onclick="scheduleAppointment('dr-martinez')">
+                                            <i class="fas fa-calendar-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="chat-item" data-specialty="oftalmologia" data-online="true" data-doctor-id="dr-lopez">
+                                    <div class="chat-avatar" style="background: linear-gradient(135deg, #ffa726, #ffb74d);">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=juanLopez&backgroundColor=ffa726,ffb74d&mouth=smile&style=circle" alt="Dr. López" class="doctor-avatar-img">
+                                        <div class="online-status" title="En línea"></div>
+                                    </div>
+                                    <div class="chat-content">
+                                        <div class="chat-header">
+                                            <div class="chat-info">
+                                                <span class="chat-name">Dr. Juan López</span>
+                                                <span class="chat-specialty">Oftalmólogo</span>
+                                            </div>
+                                            <div class="chat-meta">
+                                            <span class="chat-time">2 días</span>
+                                        </div>
+                                        </div>
+                                        <div class="chat-message">
+                                            <div class="message-bubble">
+                                                <p>Recuerda tu cita de seguimiento el próximo lunes a las 3:00 PM</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chat-actions">
+                                        <button class="action-btn" title="Ver chat completo" onclick="openChatHistory('dr-lopez')">
+                                            <i class="fas fa-comments"></i>
+                                        </button>
+                                        <button class="action-btn" title="Llamar" onclick="callDoctor('dr-lopez')">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                        <button class="action-btn" title="Agendar cita" onclick="scheduleAppointment('dr-lopez')">
+                                            <i class="fas fa-calendar-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="chat-item" data-specialty="dermatologia" data-online="false" data-doctor-id="dra-soto">
+                                    <div class="chat-avatar" style="background: linear-gradient(135deg, #9c27b0, #ba68c8);">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=anaSoto&backgroundColor=9c27b0,ba68c8&mouth=smile&style=circle" alt="Dra. Soto" class="doctor-avatar-img">
+                                        <div class="offline-status" title="Desconectado"></div>
+                                    </div>
+                                    <div class="chat-content">
+                                        <div class="chat-header">
+                                            <div class="chat-info">
+                                                <span class="chat-name">Dra. Ana Soto</span>
+                                                <span class="chat-specialty">Dermatóloga</span>
+                                            </div>
+                                            <div class="chat-meta">
+                                                <span class="chat-time">1 semana</span>
+                                            </div>
+                                        </div>
+                                        <div class="chat-message">
+                                            <div class="message-bubble">
+                                                <p>Tu tratamiento está funcionando bien. Continúa aplicando la crema dos veces al día.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chat-actions">
+                                        <button class="action-btn" title="Ver chat completo" onclick="openChatHistory('dra-soto')">
+                                            <i class="fas fa-comments"></i>
+                                        </button>
+                                        <button class="action-btn" title="Llamar" onclick="callDoctor('dra-soto')">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                        <button class="action-btn" title="Agendar cita" onclick="scheduleAppointment('dra-soto')">
+                                            <i class="fas fa-calendar-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary btn-sm" onclick="openAllChats()">
+                                <i class="fas fa-comments"></i>
+                                Ver todos los chats
+                            </button>
+        </div>
+    </div>
+
+                    <!-- Telemedicina -->
+                    <div class="communication-card card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-video"></i>
+                                Telemedicina
+                            </h3>
+                            <span class="badge badge-success">3</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="telemedicine-content">
+                                <!-- Próxima Consulta Virtual -->
+                                <div class="upcoming-consultation">
+                                    <div class="consultation-header">
+                                        <h4><i class="fas fa-calendar-check"></i> Próxima Consulta Virtual</h4>
+                                        <span class="consultation-status active">En 2 horas</span>
+                                    </div>
+                                    <div class="consultation-card">
+                                        <div class="consultation-doctor">
+                                            <div class="doctor-avatar-telemedicine">
+                                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=mariaGarcia&backgroundColor=26a69a,4db6ac&mouth=smile&style=circle" alt="Dra. García" class="doctor-avatar-img">
+                                                <div class="online-status" title="En línea"></div>
+                                            </div>
+                                            <div class="doctor-info">
+                                                <h5>Dra. María García</h5>
+                                                <p>Cardióloga</p>
+                                                <span class="consultation-time">Hoy, 14:00 - 14:30</span>
+                                            </div>
+                                    </div>
+                                    <div class="consultation-actions">
+                                            <button class="btn btn-primary" onclick="joinConsultation('dra-garcia')">
+                                                <i class="fas fa-video"></i>
+                                                Unirse ahora
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="rescheduleConsultation('dra-garcia')">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                Reprogramar
+                                            </button>
+                                            <button class="btn btn-outline btn-sm" onclick="viewConsultationDetails('dra-garcia')">
+                                                <i class="fas fa-info-circle"></i>
+                                                Detalles
+                                            </button>
+                                    </div>
+                                </div>
+                                </div>
+
+                                <!-- Consultas Programadas -->
+                                <div class="scheduled-consultations">
+                                    <h4><i class="fas fa-clock"></i> Consultas Programadas</h4>
+                                    <div class="consultation-list">
+                                        <div class="consultation-item">
+                                            <div class="consultation-doctor">
+                                                <div class="doctor-avatar-telemedicine small">
+                                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=juanLopez&backgroundColor=ffa726,ffb74d&mouth=smile&style=circle" alt="Dr. López" class="doctor-avatar-img">
+                                                </div>
+                                                <div class="consultation-info">
+                                                    <h6>Dr. Juan López</h6>
+                                                    <p>Oftalmólogo • Mañana, 10:00</p>
+                                                </div>
+                                            </div>
+                                            <div class="consultation-actions-mini">
+                                                <button class="btn btn-outline btn-sm" onclick="joinConsultation('dr-lopez')">
+                                                    <i class="fas fa-video"></i>
+                                                </button>
+                                                <button class="btn btn-outline btn-sm" onclick="rescheduleConsultation('dr-lopez')">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="consultation-item">
+                                            <div class="consultation-doctor">
+                                                <div class="doctor-avatar-telemedicine small">
+                                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=anaSoto&backgroundColor=9c27b0,ba68c8&mouth=smile&style=circle" alt="Dra. Soto" class="doctor-avatar-img">
+                                                </div>
+                                                <div class="consultation-info">
+                                                    <h6>Dra. Ana Soto</h6>
+                                                    <p>Dermatóloga • Viernes, 16:00</p>
+                                                </div>
+                                            </div>
+                                            <div class="consultation-actions-mini">
+                                                <button class="btn btn-outline btn-sm" onclick="joinConsultation('dra-soto')">
+                                                    <i class="fas fa-video"></i>
+                                                </button>
+                                                <button class="btn btn-outline btn-sm" onclick="rescheduleConsultation('dra-soto')">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Funciones Avanzadas -->
+                                <div class="telemedicine-features">
+                                    <h4><i class="fas fa-tools"></i> Funciones Avanzadas</h4>
+                                    <div class="features-grid">
+                                        <div class="feature-item" onclick="testFeature('screen-share')">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-desktop"></i>
+                </div>
+                                            <div class="feature-info">
+                                                <h6>Compartir Pantalla</h6>
+                                                <p>Muestra resultados médicos</p>
+                </div>
+                                            <div class="feature-status">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="feature-item" onclick="testFeature('chat')">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-comments"></i>
+                                            </div>
+                                            <div class="feature-info">
+                                                <h6>Chat en Vivo</h6>
+                                                <p>Mensajes durante consulta</p>
+                                            </div>
+                                            <div class="feature-status">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="feature-item" onclick="testFeature('recording')">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-record-vinyl"></i>
+                                            </div>
+                                            <div class="feature-info">
+                                                <h6>Grabación</h6>
+                                                <p>Guarda la sesión</p>
+                                            </div>
+                                            <div class="feature-status">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="feature-item" onclick="testFeature('files')">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-file-medical"></i>
+                                            </div>
+                                            <div class="feature-info">
+                                                <h6>Compartir Archivos</h6>
+                                                <p>Envía documentos médicos</p>
+                                            </div>
+                                            <div class="feature-status">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Historial de Consultas -->
+                                <div class="consultation-history">
+                                    <h4><i class="fas fa-history"></i> Historial Reciente</h4>
+                                    <div class="history-list">
+                                        <div class="history-item completed">
+                                            <div class="history-doctor">
+                                                <div class="doctor-avatar-telemedicine small">
+                                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=carlosMartinez&backgroundColor=1976d2,42a5f5&mouth=smile&style=circle" alt="Dr. Martínez" class="doctor-avatar-img">
+                                                </div>
+                                                <div class="history-info">
+                                                    <h6>Dr. Carlos Martínez</h6>
+                                                    <p>Medicina General • Ayer, 15:30</p>
+                                                    <span class="history-duration">Duración: 25 min</span>
+                                                </div>
+                                            </div>
+                                            <div class="history-actions">
+                                                <button class="btn btn-outline btn-sm" onclick="viewConsultationRecording('dr-martinez')">
+                                                    <i class="fas fa-play"></i>
+                                                    Ver grabación
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="history-item completed">
+                                            <div class="history-doctor">
+                                                <div class="doctor-avatar-telemedicine small">
+                                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=mariaGarcia&backgroundColor=26a69a,4db6ac&mouth=smile&style=circle" alt="Dra. García" class="doctor-avatar-img">
+                                                </div>
+                                                <div class="history-info">
+                                                    <h6>Dra. María García</h6>
+                                                    <p>Cardiología • Hace 3 días</p>
+                                                    <span class="history-duration">Duración: 35 min</span>
+                                                </div>
+                                            </div>
+                                            <div class="history-actions">
+                                                <button class="btn btn-outline btn-sm" onclick="viewConsultationRecording('dra-garcia')">
+                                                    <i class="fas fa-play"></i>
+                                                    Ver grabación
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary btn-sm" onclick="openTelemedicineDashboard()">
+                                <i class="fas fa-video"></i>
+                                Panel de Telemedicina
+                            </button>
+                </div>
+                </div>
+                </div>
+            </section>
+        </div>
+        </div>
+    </div>
+
+    <!-- Sistema de Notificaciones -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Modales -->
+    <!-- Modal para Tendencias Detalladas -->
+    <div class="modal" id="modalTendenciasDetalladas">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Análisis Detallado de Tendencias</h2>
+                <button class="modal-close" onclick="closeModal('modalTendenciasDetalladas')">&times;</button>
+                </div>
+            <div class="modal-body">
+                <div class="trends-analysis">
+                    <div class="trend-chart-container">
+                        <canvas id="trendsChart"></canvas>
+                </div>
+                    <div class="trend-insights">
+                        <h3>Insights del Período</h3>
+                        <div class="insight-item positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <div class="insight-content">
+                                <h4>Presión Arterial Mejorando</h4>
+                                <p>Reducción del 5% en los últimos 30 días. Continúa con tu rutina de ejercicio.</p>
+                </div>
+                </div>
+                        <div class="insight-item positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <div class="insight-content">
+                                <h4>Pérdida de Peso Consistente</h4>
+                                <p>Has perdido 2.3kg de forma saludable. Mantén tu dieta equilibrada.</p>
+                </div>
+                </div>
+                        <div class="insight-item negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <div class="insight-content">
+                                <h4>Actividad Física Disminuyendo</h4>
+                                <p>Reducción del 8% en actividad. Considera aumentar tu rutina de ejercicio.</p>
+        </div>
+    </div>
+            </div>
+        </div>
+    </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalTendenciasDetalladas')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Predicciones Detalladas -->
+    <div class="modal" id="modalPrediccionesDetalladas">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Análisis Predictivo de Salud</h2>
+                <button class="modal-close" onclick="closeModal('modalPrediccionesDetalladas')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="predictions-analysis">
+                    <div class="prediction-chart-container">
+                        <canvas id="predictionsChart"></canvas>
+                    </div>
+                    <div class="prediction-details">
+                        <div class="prediction-risk-item">
+                            <h3>Riesgo de Hipertensión</h3>
+                            <div class="risk-analysis">
+                                <p><strong>Probabilidad:</strong> 25% (Bajo riesgo)</p>
+                                <p><strong>Factores:</strong> Presión arterial estable, ejercicio regular</p>
+                                <p><strong>Recomendaciones:</strong> Mantén tu rutina actual</p>
+        </div>
+    </div>
+                        <div class="prediction-risk-item">
+                            <h3>Riesgo de Diabetes</h3>
+                            <div class="risk-analysis">
+                                <p><strong>Probabilidad:</strong> 60% (Riesgo medio)</p>
+                                <p><strong>Factores:</strong> Glucosa elevada, antecedentes familiares</p>
+                                <p><strong>Recomendaciones:</strong> Monitorea glucosa regularmente</p>
+                            </div>
+            </div>
+                        <div class="prediction-risk-item">
+                            <h3>Salud Cardiovascular</h3>
+                            <div class="risk-analysis">
+                                <p><strong>Estado:</strong> 85% (Excelente)</p>
+                                <p><strong>Factores:</strong> Frecuencia cardíaca normal, buena actividad física</p>
+                                <p><strong>Recomendaciones:</strong> Continúa con tu estilo de vida saludable</p>
+            </div>
+        </div>
+    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalPrediccionesDetalladas')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar Evento al Calendario -->
+    <div class="modal" id="modalAgregarEvento">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Agregar Evento al Calendario</h2>
+                <button class="modal-close" onclick="closeModal('modalAgregarEvento')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Título del Evento:</label>
+                        <input type="text" class="form-input" required placeholder="Ej: Cita médica">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Evento:</label>
+                        <select class="form-input form-select" required>
+                            <option value="appointment">Cita Médica</option>
+                            <option value="medication">Medicamento</option>
+                            <option value="symptoms">Síntomas</option>
+                            <option value="exercise">Ejercicio</option>
+                            <option value="tests">Pruebas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha:</label>
+                        <input type="date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hora:</label>
+                        <input type="time" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descripción:</label>
+                        <textarea class="form-input form-textarea" rows="3" placeholder="Detalles del evento"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Recordatorio:</label>
+                        <select class="form-input form-select">
+                            <option value="none">Sin recordatorio</option>
+                            <option value="15">15 minutos antes</option>
+                            <option value="30">30 minutos antes</option>
+                            <option value="60">1 hora antes</option>
+                            <option value="1440">1 día antes</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Agregar Evento</button>
+                <button class="btn btn-secondary" onclick="closeModal('modalAgregarEvento')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nuevo Mensaje -->
+    <div class="modal" id="modalNuevoMensaje">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Mensaje</h2>
+                <button class="modal-close" onclick="closeModal('modalNuevoMensaje')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Para:</label>
+                        <select class="form-input form-select" required>
+                            <option value="">Seleccionar médico</option>
+                            <option value="dra-garcia">Dra. García - Cardiología</option>
+                            <option value="dr-martinez">Dr. Martínez - Odontología</option>
+                            <option value="dr-lopez">Dr. López - Medicina General</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Asunto:</label>
+                        <input type="text" class="form-input" required placeholder="Ej: Consulta sobre medicación">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mensaje:</label>
+                        <textarea class="form-input form-textarea" rows="6" required placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Adjuntar archivos:</label>
+                        <input type="file" class="form-input" multiple>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Enviar Mensaje</button>
+                <button class="btn btn-secondary" onclick="closeModal('modalNuevoMensaje')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Compartir Informes -->
+    <div class="modal" id="modalCompartirInformes">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Compartir Informes</h2>
+                <button class="modal-close" onclick="closeModal('modalCompartirInformes')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="share-reports-content">
+                    <div class="reports-selection">
+                        <h3>Seleccionar Informes</h3>
+                        <div class="form-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="checkbox-label">Informe de Presión Arterial (Últimos 3 meses)</span>
+                            </label>
+                        </div>
+                <div class="form-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="checkbox-label">Historial de Medicación</span>
+                            </label>
+                </div>
+                <div class="form-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="checkbox-label">Resumen de Salud General</span>
+                            </label>
+                </div>
+                <div class="form-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="checkbox-label">Control de Glucosa</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="share-options">
+                        <h3>Opciones de Compartir</h3>
+                        <div class="form-group">
+                            <label class="form-label">Método:</label>
+                            <select class="form-input form-select">
+                                <option value="email">Email</option>
+                                <option value="whatsapp">WhatsApp</option>
+                                <option value="telegram">Telegram</option>
+                                <option value="download">Descargar PDF</option>
+                            </select>
+                </div>
+                <div class="form-group">
+                            <label class="form-label">Destinatario:</label>
+                            <input type="text" class="form-input" placeholder="Email o número de teléfono">
+                </div>
+                <div class="form-group">
+                            <label class="form-label">Mensaje (opcional):</label>
+                            <textarea class="form-input form-textarea" rows="3" placeholder="Mensaje personalizado..."></textarea>
+                        </div>
+                </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Compartir Informes</button>
+                <button class="btn btn-secondary" onclick="closeModal('modalCompartirInformes')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Agregar Medición (dinámico) -->
+    <div class="modal" id="modalAgregarMedicion" tabindex="-1" aria-modal="true" role="dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-notes-medical"></i> Agregar Medición</h2>
+          <button class="modal-close" onclick="closeModal('modalAgregarMedicion')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form class="form-modern" id="formAgregarMedicion" autocomplete="off">
+            <div class="form-group">
+              <label><i class="fas fa-vial"></i> Tipo de Medición</label>
+              <select class="form-input" id="tipoMedicion" required>
+                <option value="">Selecciona una opción</option>
+                <option value="presion">Presión Arterial</option>
+                <option value="glucosa">Glucosa</option>
+                <option value="peso">Peso</option>
+                <option value="temperatura">Temperatura</option>
+                <option value="oxigeno">Oxígeno en Sangre</option>
+              </select>
+              <div class="form-error">Selecciona el tipo de medición</div>
+            </div>
+            <div id="camposMedicion"></div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Guardar</button>
+              <button type="button" class="btn btn-secondary btn-lg" onclick="closeModal('modalAgregarMedicion')">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Programar Cita (mejorado) -->
+    <div class="modal" id="modalProgramarCita">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-calendar-plus"></i> Programar Cita</h2>
+          <button class="modal-close" onclick="closeModal('modalProgramarCita')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form class="form-modern">
+            <div class="form-group">
+              <label><i class="fas fa-user-md"></i> Especialidad</label>
+              <select class="form-input">
+                <option value="cardiologia">Cardiología</option>
+                <option value="medicina-general">Medicina General</option>
+                <option value="odontologia">Odontología</option>
+                <option value="nutricion">Nutrición</option>
+                <option value="psicologia">Psicología</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-user"></i> Médico</label>
+              <input type="text" class="form-input" placeholder="Ej: Dra. García">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-calendar-alt"></i> Fecha y Hora</label>
+              <input type="datetime-local" class="form-input">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-comment-dots"></i> Motivo</label>
+              <textarea class="form-input" rows="2" placeholder="Motivo de la cita"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary btn-lg"><i class="fas fa-calendar-check"></i> Agendar</button>
+          <button class="btn btn-secondary btn-lg" onclick="closeModal('modalProgramarCita')">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Ver Reportes (mejorado) -->
+    <div class="modal" id="modalReportes">
+      <div class="modal-content">
+        <div class="modal-header stats-modal-header">
+          <i class="fas fa-chart-pie stats-modal-icon"></i>
+          <h2 class="modal-title">Estadísticas de Salud</h2>
+          <button class="modal-close" onclick="closeModal('modalReportes')">&times;</button>
+        </div>
+        <div class="modal-body stats-modal-body">
+          <div class="stats-summary-grid">
+            <div class="stats-summary-card">
+              <div class="stats-summary-icon bg-primary"><i class="fas fa-heartbeat"></i></div>
+              <div class="stats-summary-info">
+                <span class="stats-summary-label">Presión Arterial</span>
+                <span class="stats-summary-value">120/80 mmHg</span>
+                <span class="stats-summary-desc">Promedio semanal</span>
+              </div>
+            </div>
+            <div class="stats-summary-card">
+              <div class="stats-summary-icon bg-success"><i class="fas fa-walking"></i></div>
+              <div class="stats-summary-info">
+                <span class="stats-summary-label">Pasos</span>
+                <span class="stats-summary-value">42,500</span>
+                <span class="stats-summary-desc">Esta semana</span>
+              </div>
+            </div>
+            <div class="stats-summary-card">
+              <div class="stats-summary-icon bg-warning"><i class="fas fa-tint"></i></div>
+              <div class="stats-summary-info">
+                <span class="stats-summary-label">Glucosa</span>
+                <span class="stats-summary-value">92 mg/dL</span>
+                <span class="stats-summary-desc">Promedio diario</span>
+              </div>
+            </div>
+            <div class="stats-summary-card">
+              <div class="stats-summary-icon bg-info"><i class="fas fa-weight"></i></div>
+              <div class="stats-summary-info">
+                <span class="stats-summary-label">Peso</span>
+                <span class="stats-summary-value">70.5 kg</span>
+                <span class="stats-summary-desc">Última medición</span>
+              </div>
+            </div>
+          </div>
+          <div class="stats-charts-row">
+            <div class="stats-chart-card">
+              <h4><i class="fas fa-chart-line"></i> Tendencia de Presión</h4>
+              <canvas id="statsChartPresion" height="120"></canvas>
+            </div>
+            <div class="stats-chart-card">
+              <h4><i class="fas fa-shoe-prints"></i> Pasos diarios</h4>
+              <canvas id="statsChartPasos" height="120"></canvas>
+            </div>
+          </div>
+          <div class="stats-modal-extra">
+            <div class="stats-extra-item">
+              <i class="fas fa-check-circle text-success"></i> ¡Buen progreso esta semana!
+            </div>
+            <div class="stats-extra-item">
+              <i class="fas fa-lightbulb text-info"></i> Recuerda registrar tus mediciones diariamente.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-lg" onclick="closeModal('modalReportes')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Próxima Dosis de Medicamento -->
+    <div class="modal" id="modalMedicacion">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Próxima Dosis de Medicamento</h2>
+          <button class="modal-close" onclick="closeModal('modalMedicacion')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Medicamento:</strong> Paracetamol 500mg</p>
+          <p><strong>Hora:</strong> 2:30 PM</p>
+          <p><strong>Instrucciones:</strong> Tomar con agua después de la comida.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary">Marcar como Tomado</button>
+          <button class="btn btn-secondary" onclick="closeModal('modalMedicacion')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Presión Arterial -->
+    <div class="modal" id="modalPresionArterial">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Presión Arterial</h2>
+          <button class="modal-close" onclick="closeModal('modalPresionArterial')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Última medición:</strong> 120/80 mmHg a las 8:00 AM</p>
+          <p><strong>Estado:</strong> Normal</p>
+          <p><strong>Recomendación:</strong> Mantén tu rutina de ejercicio y alimentación saludable.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('modalPresionArterial')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Adherencia Detallada Mejorado -->
+    <div class="modal" id="modalAdherenciaDetallada" tabindex="-1" aria-modal="true" role="dialog">
+      <div class="modal-content">
+        <div class="modal-header adherencia-header">
+          <div class="adherencia-icon"><i class="fas fa-pills"></i></div>
+          <div>
+            <h2>Informe Detallado de Adherencia</h2>
+            <div class="adherencia-badges">
+              <span class="badge badge-success"><i class="fas fa-check-circle"></i> 95% semanal</span>
+              <span class="badge badge-info"><i class="fas fa-calendar-week"></i> 19/20 dosis</span>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal('modalAdherenciaDetallada')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="adherencia-detalle">
+            <h3>Resumen de la Semana</h3>
+            <table class="adherencia-table">
+              <thead><tr><th>Día</th><th>Dosis Tomadas</th><th>Olvidos</th><th>%</th></tr></thead>
+              <tbody>
+                <tr><td>Lunes</td><td>2</td><td>1</td><td>66%</td></tr>
+                <tr><td>Martes</td><td>3</td><td>0</td><td>100%</td></tr>
+                <tr><td>Miércoles</td><td>3</td><td>0</td><td>100%</td></tr>
+                <tr><td>Jueves</td><td>3</td><td>0</td><td>100%</td></tr>
+                <tr><td>Viernes</td><td>3</td><td>0</td><td>100%</td></tr>
+                <tr><td>Sábado</td><td>3</td><td>0</td><td>100%</td></tr>
+                <tr><td>Domingo</td><td>2</td><td>1</td><td>66%</td></tr>
+              </tbody>
+            </table>
+            <div class="adherencia-extra">
+              <div><strong>Promedio últimas 4 semanas:</strong> <span class="badge badge-primary">93%</span></div>
+              <div><strong>Última dosis tomada:</strong> 18/06/2023 21:00</div>
+            </div>
+            <div class="adherencia-grafico" style="margin-top:1.5em;">
+              <canvas id="adherenciaDetalleChart" height="160"></canvas>
+            </div>
+            <div class="adherencia-mensaje">
+              <i class="fas fa-trophy"></i> ¡Excelente adherencia! Mantén tu rutina y usa recordatorios.
+            </div>
+            <div class="adherencia-recomendaciones">
+              <h4><i class="fas fa-lightbulb"></i> Recomendaciones</h4>
+              <ul>
+                <li><i class="fas fa-bell"></i> Activa recordatorios en tu móvil.</li>
+                <li><i class="fas fa-user-md"></i> Consulta a tu médico si olvidas varias dosis.</li>
+                <li><i class="fas fa-calendar-check"></i> Lleva un registro diario.</li>
+              </ul>
+            </div>
+            <div style="text-align:right; margin-top:1.2em;">
+              <button class="btn btn-info btn-sm"><i class="fas fa-history"></i> Ver historial completo</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-lg" onclick="closeModal('modalAdherenciaDetallada')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Próxima Cita -->
+    <div class="modal" id="modalCitas">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Próxima Cita</h2>
+          <button class="modal-close" onclick="closeModal('modalCitas')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Fecha:</strong> 15 Mayo</p>
+          <p><strong>Hora:</strong> 10:30 AM</p>
+          <p><strong>Médico:</strong> Dra. García (Cardiología)</p>
+          <p><strong>Lugar:</strong> Hospital Central</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('modalCitas')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Presión Arterial Detallada -->
+    <div class="modal" id="modalPresionDetalle" tabindex="-1" aria-modal="true" role="dialog">
+      <div class="modal-content">
+        <div class="modal-header presion-header">
+          <div class="presion-icon"><i class="fas fa-heartbeat"></i></div>
+          <div>
+            <h2>Registros de Presión Arterial</h2>
+            <div class="presion-badges">
+              <span class="badge badge-success"><i class="fas fa-check-circle"></i> Promedio semanal: 120/80</span>
+              <span class="badge badge-info"><i class="fas fa-calendar-week"></i> 7 registros</span>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal('modalPresionDetalle')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="presion-detalle">
+            <h3>Últimos Registros</h3>
+            <table class="presion-table">
+              <thead><tr><th>Fecha</th><th>Sistólica</th><th>Diastólica</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td>18/06/2023 08:00</td><td>120</td><td>80</td><td><span class="badge badge-success">Normal</span></td></tr>
+                <tr><td>17/06/2023 08:00</td><td>125</td><td>82</td><td><span class="badge badge-success">Normal</span></td></tr>
+                <tr><td>16/06/2023 08:00</td><td>130</td><td>85</td><td><span class="badge badge-warning">Elevada</span></td></tr>
+                <tr><td>15/06/2023 08:00</td><td>118</td><td>78</td><td><span class="badge badge-success">Normal</span></td></tr>
+                <tr><td>14/06/2023 08:00</td><td>122</td><td>81</td><td><span class="badge badge-success">Normal</span></td></tr>
+                <tr><td>13/06/2023 08:00</td><td>135</td><td>88</td><td><span class="badge badge-danger">Alta</span></td></tr>
+                <tr><td>12/06/2023 08:00</td><td>119</td><td>79</td><td><span class="badge badge-success">Normal</span></td></tr>
+              </tbody>
+            </table>
+            <div class="presion-extra">
+              <div><strong>Promedio mensual:</strong> <span class="badge badge-primary">123/82</span></div>
+              <div><strong>Última medición:</strong> 18/06/2023 08:00</div>
+            </div>
+            <div class="presion-grafico" style="margin-top:1.5em;">
+              <canvas id="presionDetalleChart" height="160"></canvas>
+            </div>
+            <div class="presion-mensaje">
+              <i class="fas fa-info-circle"></i> Tu presión arterial está dentro de los valores normales. ¡Sigue así!
+            </div>
+            <div class="presion-recomendaciones">
+              <h4><i class="fas fa-lightbulb"></i> Recomendaciones</h4>
+              <ul>
+                <li><i class="fas fa-running"></i> Mantén actividad física regular.</li>
+                <li><i class="fas fa-apple-alt"></i> Sigue una dieta baja en sal.</li>
+                <li><i class="fas fa-user-md"></i> Consulta a tu médico ante cualquier cambio.</li>
+              </ul>
+            </div>
+            <div style="text-align:right; margin-top:1.2em;">
+              <button class="btn btn-info btn-sm"><i class="fas fa-history"></i> Ver historial completo</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-lg" onclick="closeModal('modalPresionDetalle')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Actividad Física Detallada -->
+    <div class="modal" id="modalActividadDetalle" tabindex="-1" aria-modal="true" role="dialog">
+      <div class="modal-content">
+        <div class="modal-header actividad-header">
+          <div class="actividad-icon"><i class="fas fa-running"></i></div>
+          <div>
+            <h2>Registros de Actividad Física</h2>
+            <div class="actividad-badges">
+              <span class="badge badge-success"><i class="fas fa-check-circle"></i> Promedio semanal: 42 min/día</span>
+              <span class="badge badge-info"><i class="fas fa-calendar-week"></i> 7 registros</span>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal('modalActividadDetalle')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="actividad-detalle">
+            <h3>Últimos Registros</h3>
+            <table class="actividad-table">
+              <thead><tr><th>Fecha</th><th>Actividad</th><th>Duración</th><th>Calorías</th></tr></thead>
+              <tbody>
+                <tr><td>18/06/2023</td><td>Caminata</td><td>40 min</td><td>180</td></tr>
+                <tr><td>17/06/2023</td><td>Bicicleta</td><td>50 min</td><td>320</td></tr>
+                <tr><td>16/06/2023</td><td>Yoga</td><td>30 min</td><td>90</td></tr>
+                <tr><td>15/06/2023</td><td>Correr</td><td>35 min</td><td>250</td></tr>
+                <tr><td>14/06/2023</td><td>Caminata</td><td>45 min</td><td>200</td></tr>
+                <tr><td>13/06/2023</td><td>Natación</td><td>60 min</td><td>400</td></tr>
+                <tr><td>12/06/2023</td><td>Correr</td><td>35 min</td><td>250</td></tr>
+              </tbody>
+            </table>
+            <div class="actividad-extra">
+              <div><strong>Promedio mensual:</strong> <span class="badge badge-primary">38 min/día</span></div>
+              <div><strong>Última actividad:</strong> 18/06/2023 Caminata</div>
+            </div>
+            <div class="actividad-grafico" style="margin-top:1.5em;">
+              <canvas id="actividadDetalleChart" height="160"></canvas>
+            </div>
+            <div class="actividad-mensaje">
+              <i class="fas fa-trophy"></i> ¡Buen trabajo! Mantén tu nivel de actividad física.
+            </div>
+            <div class="actividad-recomendaciones">
+              <h4><i class="fas fa-lightbulb"></i> Recomendaciones</h4>
+              <ul>
+                <li><i class="fas fa-walking"></i> Intenta caminar al menos 30 min diarios.</li>
+                <li><i class="fas fa-bicycle"></i> Varía tus actividades para mayor motivación.</li>
+                <li><i class="fas fa-user-md"></i> Consulta a tu médico antes de aumentar la intensidad.</li>
+              </ul>
+            </div>
+            <div style="text-align:right; margin-top:1.2em;">
+              <button class="btn btn-info btn-sm"><i class="fas fa-history"></i> Ver historial completo</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-lg" onclick="closeModal('modalActividadDetalle')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Eventos del Día (Calendario) -->
+    <div class="modal" id="modalEventosDia">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="eventosDiaTitulo">Eventos del día</h2>
+          <button class="modal-close" onclick="closeModal('modalEventosDia')">&times;</button>
+        </div>
+        <div class="modal-body" id="eventosDiaLista">
+          <!-- Aquí se mostrarán los eventos del día seleccionado -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('modalEventosDia')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="Scripts/inicio.js"></script>
+
+    <!-- MediBot CSS -->
+    <link rel="stylesheet" href="medibot/medibot.css">
+    
+    <!-- MediBot HTML Structure -->
+    <div id="medibotContainer" class="medibot-container">
+        <div id="medibotHeader" class="medibot-header">
+            <div class="header-content">
+                <i class="fas fa-user-md"></i>
+                <h2>MediBot</h2>
+                <div class="connection-status">
+                    <span class="online-status">●</span>
+                    <span>En línea</span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button id="medibotVoice" class="control-btn" title="Activar/Desactivar voz">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button id="medibotMinimize" class="control-btn" title="Minimizar">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button id="medibotClose" class="control-btn" title="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="medibotMessages" class="medibot-messages">
+            <!-- Los mensajes se agregarán dinámicamente aquí -->
+        </div>
+        
+        <div id="medibotQuickActions" class="medibot-quick-actions">
+            <!-- Las acciones rápidas se agregarán dinámicamente aquí -->
+        </div>
+        
+        <div class="medibot-input-area">
+            <input type="text" id="medibotInput" class="medibot-input" placeholder="Escribe tu mensaje..." maxlength="500">
+            <button id="medibotVoiceInput" class="voice-btn" title="Usar voz">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button id="medibotSend" class="send-btn" title="Enviar">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Botón flotante para abrir el MediBot -->
+    <button id="medibotToggle" class="medibot-toggle" aria-expanded="false" title="Abrir MediBot">
+        <i class="fas fa-user-md"></i>
+        <span id="notificationBadge" class="notification-badge hidden">0</span>
+    </button>
+
+    <!-- MediBot JavaScript -->
+    <script src="medibot/medibot.js"></script>
+    <script>
+// Animación y validación para modales mejorados
+function showModal(modalId) {
+  document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('show');
+    setTimeout(() => {
+      const firstInput = modal.querySelector('input,select,textarea');
+      if(firstInput) firstInput.focus();
+    }, 200);
+  }
+}
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('show');
+  }
+}
+// Reemplaza openModal para usar showModal con animación
+window.openModal = showModal;
+window.closeModal = closeModal;
+
+const camposPorTipo = {
+  presion: `
+    <div class='form-group'>
+      <label><i class='fas fa-arrow-up'></i> Sistólica (mmHg)</label>
+      <input type='number' class='form-input' id='sistolica' min='50' max='250' required placeholder='Ej: 120'>
+      <div class='form-error'>Ingresa la presión sistólica</div>
+    </div>
+    <div class='form-group'>
+      <label><i class='fas fa-arrow-down'></i> Diastólica (mmHg)</label>
+      <input type='number' class='form-input' id='diastolica' min='30' max='150' required placeholder='Ej: 80'>
+      <div class='form-error'>Ingresa la presión diastólica</div>
+    </div>
+    <div class='form-group'>
+      <label><i class='fas fa-calendar-alt'></i> Fecha y Hora</label>
+      <input type='datetime-local' class='form-input' id='fechaPresion' required>
+      <div class='form-error'>Selecciona fecha y hora</div>
+    </div>
+  `,
+  glucosa: `
+    <div class='form-group'>
+      <label><i class='fas fa-tint'></i> Glucosa (mg/dL)</label>
+      <input type='number' class='form-input' id='glucosa' min='20' max='600' required placeholder='Ej: 90'>
+      <div class='form-error'>Ingresa el valor de glucosa</div>
+    </div>
+    <div class='form-group'>
+      <label><i class='fas fa-calendar-alt'></i> Fecha y Hora</label>
+      <input type='datetime-local' class='form-input' id='fechaGlucosa' required>
+      <div class='form-error'>Selecciona fecha y hora</div>
+    </div>
+  `,
+  peso: `
+    <div class='form-group'>
+      <label><i class='fas fa-weight'></i> Peso (kg)</label>
+      <input type='number' class='form-input' id='peso' min='20' max='300' step='0.1' required placeholder='Ej: 70.5'>
+      <div class='form-error'>Ingresa tu peso</div>
+    </div>
+    <div class='form-group'>
+      <label><i class='fas fa-calendar-alt'></i> Fecha y Hora</label>
+      <input type='datetime-local' class='form-input' id='fechaPeso' required>
+      <div class='form-error'>Selecciona fecha y hora</div>
+    </div>
+  `,
+  temperatura: `
+    <div class='form-group'>
+      <label><i class='fas fa-thermometer-half'></i> Temperatura (°C)</label>
+      <input type='number' class='form-input' id='temperatura' min='30' max='45' step='0.1' required placeholder='Ej: 36.5'>
+      <div class='form-error'>Ingresa la temperatura</div>
+    </div>
+    <div class='form-group'>
+      <label><i class='fas fa-calendar-alt'></i> Fecha y Hora</label>
+      <input type='datetime-local' class='form-input' id='fechaTemp' required>
+      <div class='form-error'>Selecciona fecha y hora</div>
+    </div>
+  `,
+  oxigeno: `
+    <div class='form-group'>
+      <label><i class='fas fa-lungs'></i> Oxígeno en Sangre (%SpO2)</label>
+      <input type='number' class='form-input' id='oxigeno' min='50' max='100' required placeholder='Ej: 98'>
+      <div class='form-error'>Ingresa el porcentaje de oxígeno</div>
+    </div>
+    <div class='form-group'>
+      <label><i class='fas fa-calendar-alt'></i> Fecha y Hora</label>
+      <input type='datetime-local' class='form-input' id='fechaOxigeno' required>
+      <div class='form-error'>Selecciona fecha y hora</div>
+    </div>
+  `
+};
+function renderCamposMedicion() {
+  const tipo = document.getElementById('tipoMedicion').value;
+  const campos = camposPorTipo[tipo] || '';
+  document.getElementById('camposMedicion').innerHTML = campos;
+}
+// --- LÓGICA DE MEDICIONES EN LOCALSTORAGE Y RENDER DE TARJETAS ---
+const ICONOS_MEDICION = {
+  presion: 'fa-heartbeat',
+  glucosa: 'fa-tint',
+  peso: 'fa-weight',
+  temperatura: 'fa-thermometer-half',
+  oxigeno: 'fa-lungs'
+};
+function guardarMedicionLocalStorage(medicion) {
+  let mediciones = JSON.parse(localStorage.getItem('mediciones')) || [];
+  mediciones.unshift(medicion); // Agrega al inicio
+  localStorage.setItem('mediciones', JSON.stringify(mediciones));
+}
+function eliminarMedicionLocalStorage(idx) {
+  let mediciones = JSON.parse(localStorage.getItem('mediciones')) || [];
+  mediciones.splice(idx, 1);
+  localStorage.setItem('mediciones', JSON.stringify(mediciones));
+  renderMedicionesResumen();
+}
+function renderMedicionesResumen() {
+  const cont = document.getElementById('medicionesResumen');
+  if (!cont) return;
+  let mediciones = JSON.parse(localStorage.getItem('mediciones')) || [];
+  if (mediciones.length === 0) {
+    cont.innerHTML = `<div class='empty-msg'>No hay mediciones registradas aún.</div>`;
+    return;
+  }
+  cont.innerHTML = mediciones.map((m, idx) => {
+    let valor = '';
+    if (m.tipo === 'presion') valor = `${m.sistolica}/${m.diastolica} mmHg`;
+    else if (m.tipo === 'glucosa') valor = `${m.glucosa} mg/dL`;
+    else if (m.tipo === 'peso') valor = `${m.peso} kg`;
+    else if (m.tipo === 'temperatura') valor = `${m.temperatura} °C`;
+    else if (m.tipo === 'oxigeno') valor = `${m.oxigeno} %SpO2`;
+    let fecha = m.fecha || m.fechaPresion || m.fechaGlucosa || m.fechaPeso || m.fechaTemp || m.fechaOxigeno || '';
+    let fechaTxt = fecha ? new Date(fecha).toLocaleString('es-ES', {dateStyle:'short', timeStyle:'short'}) : '';
+    return `
+      <div class='stat-card card animate-fade-in-up medicion-card'>
+        <div class='stat-icon'><i class='fas ${ICONOS_MEDICION[m.tipo]}'></i></div>
+        <div class='stat-content'>
+          <h3 class='stat-number'>${valor}</h3>
+          <p class='stat-label'>${tipoMedicionTexto(m.tipo)}</p>
+          <div class='stat-details'>
+            <span class='stat-description'>${fechaTxt}</span>
+          </div>
+        </div>
+        <button class='delete-btn' title='Eliminar' onclick='eliminarMedicionLocalStorage(${idx})'><i class='fas fa-trash'></i></button>
+      </div>
+    `;
+  }).join('');
+}
+function tipoMedicionTexto(tipo) {
+  switch(tipo) {
+    case 'presion': return 'Presión Arterial';
+    case 'glucosa': return 'Glucosa';
+    case 'peso': return 'Peso';
+    case 'temperatura': return 'Temperatura';
+    case 'oxigeno': return 'Oxígeno en Sangre';
+    default: return '';
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('tipoMedicion').addEventListener('change', renderCamposMedicion);
+  renderCamposMedicion();
+  document.getElementById('formAgregarMedicion').onsubmit = function(e) {
+    e.preventDefault();
+    let valido = true;
+    this.querySelectorAll('.form-error').forEach(el => el.classList.remove('show'));
+    const tipo = document.getElementById('tipoMedicion').value;
+    if (!tipo) {
+      this.querySelector('select').classList.add('invalid');
+      this.querySelector('.form-error').classList.add('show');
+      valido = false;
+    }
+    let medicion = { tipo };
+    if (tipo === 'presion') {
+      const sistolica = document.getElementById('sistolica');
+      const diastolica = document.getElementById('diastolica');
+      const fecha = document.getElementById('fechaPresion');
+      if (!sistolica.value) { sistolica.classList.add('invalid'); sistolica.nextElementSibling.classList.add('show'); valido = false; }
+      if (!diastolica.value) { diastolica.classList.add('invalid'); diastolica.nextElementSibling.classList.add('show'); valido = false; }
+      if (!fecha.value) { fecha.classList.add('invalid'); fecha.nextElementSibling.classList.add('show'); valido = false; }
+      medicion.sistolica = sistolica.value; medicion.diastolica = diastolica.value; medicion.fechaPresion = fecha.value;
+    } else if (tipo === 'glucosa') {
+      const glucosa = document.getElementById('glucosa');
+      const fecha = document.getElementById('fechaGlucosa');
+      if (!glucosa.value) { glucosa.classList.add('invalid'); glucosa.nextElementSibling.classList.add('show'); valido = false; }
+      if (!fecha.value) { fecha.classList.add('invalid'); fecha.nextElementSibling.classList.add('show'); valido = false; }
+      medicion.glucosa = glucosa.value; medicion.fechaGlucosa = fecha.value;
+    } else if (tipo === 'peso') {
+      const peso = document.getElementById('peso');
+      const fecha = document.getElementById('fechaPeso');
+      if (!peso.value) { peso.classList.add('invalid'); peso.nextElementSibling.classList.add('show'); valido = false; }
+      if (!fecha.value) { fecha.classList.add('invalid'); fecha.nextElementSibling.classList.add('show'); valido = false; }
+      medicion.peso = peso.value; medicion.fechaPeso = fecha.value;
+    } else if (tipo === 'temperatura') {
+      const temperatura = document.getElementById('temperatura');
+      const fecha = document.getElementById('fechaTemp');
+      if (!temperatura.value) { temperatura.classList.add('invalid'); temperatura.nextElementSibling.classList.add('show'); valido = false; }
+      if (!fecha.value) { fecha.classList.add('invalid'); fecha.nextElementSibling.classList.add('show'); valido = false; }
+      medicion.temperatura = temperatura.value; medicion.fechaTemp = fecha.value;
+    } else if (tipo === 'oxigeno') {
+      const oxigeno = document.getElementById('oxigeno');
+      const fecha = document.getElementById('fechaOxigeno');
+      if (!oxigeno.value) { oxigeno.classList.add('invalid'); oxigeno.nextElementSibling.classList.add('show'); valido = false; }
+      if (!fecha.value) { fecha.classList.add('invalid'); fecha.nextElementSibling.classList.add('show'); valido = false; }
+      medicion.oxigeno = oxigeno.value; medicion.fechaOxigeno = fecha.value;
+    }
+    if (valido) {
+      guardarMedicionLocalStorage(medicion);
+      closeModal('modalAgregarMedicion');
+      renderMedicionesResumen();
+      alert('¡Medición guardada correctamente!');
+    }
+  };
+  renderMedicionesResumen();
+  if(window.Chart && document.getElementById('adherenciaDetalleChart')) {
+    new Chart(document.getElementById('adherenciaDetalleChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [{
+          label: 'Dosis tomadas',
+          data: [2, 3, 3, 3, 3, 3, 2],
+          backgroundColor: '#26a69a',
+        },{
+          label: 'Olvidos',
+          data: [1, 0, 0, 0, 0, 0, 1],
+          backgroundColor: '#f44336',
+        }]
+      },
+      options: {
+        plugins: { legend: { display: true } },
+        scales: { y: { beginAtZero: true, max: 3 } }
+      }
+    });
+  }
+  if(window.Chart && document.getElementById('presionDetalleChart')) {
+    new Chart(document.getElementById('presionDetalleChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['12/06', '13/06', '14/06', '15/06', '16/06', '17/06', '18/06'],
+        datasets: [
+          { label: 'Sistólica', data: [119,135,122,118,130,125,120], borderColor: '#26a69a', backgroundColor: 'rgba(38,166,154,0.08)', tension:0.3 },
+          { label: 'Diastólica', data: [79,88,81,78,85,82,80], borderColor: '#1976d2', backgroundColor: 'rgba(25,118,210,0.08)', tension:0.3 }
+        ]
+      },
+      options: {
+        plugins: { legend: { display: true } },
+        scales: { y: { beginAtZero: false, min: 60, max: 150 } }
+      }
+    });
+  }
+  if(window.Chart && document.getElementById('actividadDetalleChart')) {
+    new Chart(document.getElementById('actividadDetalleChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['12/06', '13/06', '14/06', '15/06', '16/06', '17/06', '18/06'],
+        datasets: [
+          { label: 'Minutos', data: [35,60,45,35,30,50,40], backgroundColor: '#26a69a' },
+          { label: 'Calorías', data: [250,400,200,250,90,320,180], backgroundColor: '#ffb74d' }
+        ]
+      },
+      options: {
+        plugins: { legend: { display: true } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Recordatorios Extra</title>
+    <link rel="stylesheet" href="Estilos/Recordatorios.css">
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <link rel="stylesheet" href="sidebar/sidebar-responsive.css">
+        <link rel="stylesheet" href="medibot/medibot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body { padding-top: 80px; }
+        .main-content { margin-left: 0; max-width: 1400px; margin: 0 auto; }
+        @media (max-width: 768px) { body { padding-top: 70px; } }
+    </style>
+    <script>
+        async function loadSidebar() {
+            try {
+                const response = await fetch('sidebar/sidebar.html');
+                const sidebarHTML = await response.text();
+                document.body.insertAdjacentHTML('afterbegin', sidebarHTML);
+                // Ajustar el margen del contenido principal después de cargar el sidebar
+                const sidebarElement = document.querySelector('.sidebar');
+                const mainContent = document.querySelector('.main-content');
+                if (sidebarElement && mainContent) {
+                    mainContent.style.marginLeft = `${sidebarElement.offsetWidth}px`;
+                }
+                // Inicializar el sidebar
+                if (typeof initializeSidebar === 'function') {
+                    initializeSidebar();
+                }
+            } catch (error) {
+                console.error('Error al cargar el sidebar:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSidebar);
+    </script>
+</head>
+<body>
+    <!-- Navbar superior moderno -->
+    <div id="navbar-container"></div>
+
+    <main class="main-content extra-reminders-content" role="main" aria-label="Contenido principal">
+        <header class="page-header">
+                <div class="breadcrumbs">
+                <a href="Inicio.html"><i class="fas fa-home"></i> Inicio</a>
+                <i class="fas fa-chevron-right separator"></i>
+                <span><i class="fas fa-bell"></i> Recordatorios Extra</span>
+            </div>
+            <div class="header-actions">
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <i class="fas fa-bell"></i>
+                        <span id="total-reminders-stat">0 <small>Recordatorios totales</small></span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="active-reminders-stat">0 <small>Activos hoy</small></span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span id="completed-reminders-stat">0 <small>Completados</small></span>
+                    </div>
+                </div>
+                <div class="header-buttons">
+                    <button class="primary-button" id="add-new-reminder-button">
+                        <i class="fas fa-plus"></i> Nuevo Recordatorio
+                    </button>
+                </div>
+                </div>
+                <h1>Recordatorios Extra</h1>
+            <p class="page-subtitle">Configura alertas personalizadas para tus necesidades diarias de salud.</p>
+            
+            <!-- Insights de recordatorios -->
+            <div class="reminder-insights">
+                <div class="insight-card">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <h3>Próximo recordatorio</h3>
+                        <p id="insight-next-reminder">-</p>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <i class="fas fa-calendar-week"></i>
+                    <div>
+                        <h3>Esta semana</h3>
+                        <p id="insight-this-week">-</p>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <h3>Adherencia</h3>
+                        <p id="insight-adherence">-</p>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <h3>Pendientes</h3>
+                        <p id="insight-overdue">-</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </header>
+
+        <div class="reminders-container">
+            <section class="active-reminders-section">
+                <header class="section-header">
+                    <div class="section-title">
+                        <h2><i class="fas fa-bell"></i> Recordatorios Activos</h2>
+                        <div class="filter-options">
+                            <select id="reminder-filter">
+                                <option value="all">Todos los recordatorios</option>
+                                <option value="today">Hoy</option>
+                                <option value="week">Esta semana</option>
+                                <option value="month">Este mes</option>
+                                <option value="medication">Medicamentos</option>
+                                <option value="appointment">Citas</option>
+                                <option value="measurement">Mediciones</option>
+                                <option value="exercise">Ejercicio</option>
+                                <option value="custom">Personalizados</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="view-options">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button class="view-btn" data-view="calendar">
+                            <i class="fas fa-calendar"></i>
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="reminders-toolbar">
+                    <button class="secondary-button small" id="show-active"><i class="fas fa-bell"></i> Activo</button>
+                    <button class="secondary-button small" id="show-completed"><i class="fas fa-check-circle"></i> Completados</button>
+                    <button class="secondary-button small" id="show-overdue"><i class="fas fa-exclamation-triangle"></i> Vencidos</button>
+                </div>
+                
+                <div class="reminders-grid" id="reminders-grid">
+                    <!-- Los recordatorios se renderizan dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Dashboard de Analytics -->
+            <!-- <section class="analytics-dashboard"> ... </section> -->
+
+            <!-- Recordatorios Completados -->
+            <!-- <section class="completed-reminders-section"> ... </section> -->
+
+            <!-- Recordatorios Vencidos -->
+            <!-- <section class="overdue-reminders-section"> ... </section> -->
+
+            <!-- Configuración de Notificaciones -->
+            <!-- <section class="notification-settings-section"> ... </section> -->
+        </div>
+        </main>
+
+    <!-- Modales Mejorados -->
+    
+    <!-- Modal: Nuevo Recordatorio -->
+    <div id="addReminderModal" class="modal">
+        <div class="modal-content reminder-form-modal">
+            <div class="modal-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="header-text">
+                        <h2>Nuevo Recordatorio</h2>
+                        <p>Configura tu recordatorio personalizado</p>
+                    </div>
+                </div>
+                <button class="close-button" data-modal-id="addReminderModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="add-reminder-form">
+                    <!-- Progreso del formulario -->
+                    <div class="form-progress">
+                        <div class="progress-step active" data-step="1">
+                            <div class="step-number">1</div>
+                            <span>Información Básica</span>
+                        </div>
+                        <div class="progress-step" data-step="2">
+                            <div class="step-number">2</div>
+                            <span>Programación</span>
+                        </div>
+                        <div class="progress-step" data-step="3">
+                            <div class="step-number">3</div>
+                            <span>Configuración</span>
+                        </div>
+                    </div>
+
+                    <!-- Paso 1: Información Básica -->
+                    <div class="form-step active" data-step="1">
+                        <div class="step-header">
+                            <h3><i class="fas fa-info-circle"></i> Información Básica</h3>
+                            <p>Completa los datos principales del recordatorio</p>
+                        </div>
+                        
+                    <div class="form-group">
+                            <label for="reminder-title">
+                                <i class="fas fa-tag"></i> Título del Recordatorio
+                            </label>
+                            <input type="text" id="reminder-title" required maxlength="100" 
+                                   placeholder="Ej: Tomar medicamento para la presión">
+                            <div class="input-help">Describe brevemente qué necesitas recordar</div>
+                    </div>
+                        
+                        <div class="form-group">
+                            <label for="reminder-description">
+                                <i class="fas fa-align-left"></i> Descripción (Opcional)
+                            </label>
+                            <textarea id="reminder-description" rows="3" maxlength="200" 
+                                      placeholder="Agrega detalles adicionales, instrucciones especiales o notas importantes..."></textarea>
+                            <div class="input-help">Información adicional que te ayude a completar la tarea</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reminder-category">
+                                <i class="fas fa-folder"></i> Categoría
+                            </label>
+                            <div class="category-selector">
+                                <div class="category-option" data-value="medication">
+                                    <i class="fas fa-pills"></i>
+                                    <span>Medicamento</span>
+                                </div>
+                                <div class="category-option" data-value="appointment">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Cita Médica</span>
+                                </div>
+                                <div class="category-option" data-value="measurement">
+                                    <i class="fas fa-thermometer-half"></i>
+                                    <span>Medición</span>
+                                </div>
+                                <div class="category-option" data-value="exercise">
+                                    <i class="fas fa-dumbbell"></i>
+                                    <span>Ejercicio</span>
+                                </div>
+                                <div class="category-option" data-value="water">
+                                    <i class="fas fa-tint"></i>
+                                    <span>Agua</span>
+                                </div>
+                                <div class="category-option" data-value="custom">
+                                    <i class="fas fa-bell"></i>
+                                    <span>Personalizado</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="reminder-category" value="custom" required>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Programación -->
+                    <div class="form-step" data-step="2">
+                        <div class="step-header">
+                            <h3><i class="fas fa-clock"></i> Programación</h3>
+                            <p>Define cuándo y con qué frecuencia se activará</p>
+                        </div>
+                        
+                    <div class="form-row">
+                        <div class="form-group">
+                                <label for="reminder-date">
+                                    <i class="fas fa-calendar"></i> Fecha
+                                </label>
+                                <input type="date" id="reminder-date" required>
+                                <div class="input-help">Cuándo debe activarse el recordatorio</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="reminder-time">
+                                    <i class="fas fa-clock"></i> Hora
+                                </label>
+                                <input type="time" id="reminder-time" required>
+                                <div class="input-help">A qué hora específica</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reminder-repeat">
+                                <i class="fas fa-redo"></i> Repetición
+                            </label>
+                            <div class="repeat-selector">
+                                <div class="repeat-option" data-value="none">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>No repetir</span>
+                                </div>
+                                <div class="repeat-option" data-value="daily">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span>Diario</span>
+                                </div>
+                                <div class="repeat-option" data-value="weekly">
+                                    <i class="fas fa-calendar-week"></i>
+                                    <span>Semanal</span>
+                                </div>
+                                <div class="repeat-option" data-value="monthly">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Mensual</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="reminder-repeat" value="none">
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Configuración -->
+                    <div class="form-step" data-step="3">
+                        <div class="step-header">
+                            <h3><i class="fas fa-cog"></i> Configuración</h3>
+                            <p>Personaliza la importancia y opciones adicionales</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reminder-priority">
+                                <i class="fas fa-exclamation-triangle"></i> Prioridad
+                            </label>
+                            <div class="priority-selector">
+                                <div class="priority-option" data-value="low">
+                                    <div class="priority-indicator low"></div>
+                                    <span>Baja</span>
+                                </div>
+                                <div class="priority-option active" data-value="medium">
+                                    <div class="priority-indicator medium"></div>
+                                    <span>Media</span>
+                                </div>
+                                <div class="priority-option" data-value="high">
+                                    <div class="priority-indicator high"></div>
+                                    <span>Alta</span>
+                                </div>
+                                <div class="priority-option" data-value="urgent">
+                                    <div class="priority-indicator urgent"></div>
+                                    <span>Urgente</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="reminder-priority" value="medium">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reminder-tags">
+                                <i class="fas fa-tags"></i> Etiquetas (Opcional)
+                            </label>
+                            <div class="tags-input-container">
+                                <input type="text" id="reminder-tags" placeholder="Escribe una etiqueta y presiona Enter">
+                                <div class="selected-tags"></div>
+                            </div>
+                            <div class="input-help">Etiquetas para organizar mejor tus recordatorios</div>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label" for="reminder-important">
+                                <input type="checkbox" id="reminder-important">
+                                <span class="checkmark"></span>
+                                <i class="fas fa-star"></i>
+                                <span>Marcar como importante</span>
+                            </label>
+                            <div class="input-help">Los recordatorios importantes tienen notificaciones especiales</div>
+                        </div>
+                    </div>
+
+                    <!-- Navegación entre pasos -->
+                    <div class="form-navigation">
+                        <button type="button" class="secondary-button" id="prev-step" style="display: none;">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="primary-button" id="next-step">
+                            Siguiente <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="submit" class="primary-button" id="submit-form" style="display: none;">
+                            <i class="fas fa-check"></i> Crear Recordatorio
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Editar Recordatorio -->
+    <div id="editReminderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Editar Recordatorio</h2>
+                <button class="close-button" data-modal-id="editReminderModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-reminder-form">
+                    <input type="hidden" id="edit-reminder-id">
+                <div class="form-group">
+                    <label for="edit-reminder-title">Título</label>
+                        <input type="text" id="edit-reminder-title" required maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="edit-reminder-description">Descripción</label>
+                        <textarea id="edit-reminder-description" rows="3" maxlength="200"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-reminder-date">Fecha</label>
+                            <input type="date" id="edit-reminder-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-reminder-time">Hora</label>
+                            <input type="time" id="edit-reminder-time" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-reminder-category">Categoría</label>
+                            <select id="edit-reminder-category" required>
+                                <option value="medication">Medicamento</option>
+                                <option value="appointment">Cita Médica</option>
+                                <option value="measurement">Medición</option>
+                                <option value="exercise">Ejercicio</option>
+                                <option value="water">Agua</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-reminder-priority">Prioridad</label>
+                            <select id="edit-reminder-priority">
+                                <option value="low">Baja</option>
+                                <option value="medium">Media</option>
+                                <option value="high">Alta</option>
+                                <option value="urgent">Urgente</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-reminder-repeat">Repetir</label>
+                            <select id="edit-reminder-repeat">
+                                <option value="none">No repetir</option>
+                                <option value="daily">Diario</option>
+                                <option value="weekly">Semanal</option>
+                                <option value="monthly">Mensual</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-reminder-status">Estado</label>
+                            <select id="edit-reminder-status">
+                                <option value="active">Activo</option>
+                                <option value="completed">Completado</option>
+                                <option value="snoozed">Pospuesto</option>
+                                <option value="cancelled">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="primary-button">Actualizar</button>
+                        <button type="button" class="secondary-button close-button" data-modal-id="editReminderModal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal: Confirmar Eliminación -->
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h2>
+                <button class="close-button" data-modal-id="deleteConfirmModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar este recordatorio?</p>
+                <p class="warning-text">Esta acción no se puede deshacer.</p>
+                <div class="modal-actions">
+                    <button type="button" class="danger-button" id="confirm-delete">Eliminar</button>
+                    <button type="button" class="secondary-button close-button" data-modal-id="deleteConfirmModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Panel de Filtros Avanzados -->
+    <div class="advanced-filters-panel" id="advancedFiltersPanel">
+        <div class="filters-header">
+            <h3><i class="fas fa-filter"></i> Filtros Avanzados</h3>
+            <button class="close-filters-btn" id="closeFiltersBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="filters-content">
+            <div class="filter-group">
+                <label>Rango de Fechas</label>
+                <div class="date-range">
+                    <input type="date" id="filter-start-date">
+                    <span>a</span>
+                    <input type="date" id="filter-end-date">
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Categorías</label>
+                <div class="category-filter">
+                    <label><input type="checkbox" value="medication" checked> Medicamentos</label>
+                    <label><input type="checkbox" value="appointment" checked> Citas</label>
+                    <label><input type="checkbox" value="measurement" checked> Mediciones</label>
+                    <label><input type="checkbox" value="exercise" checked> Ejercicio</label>
+                    <label><input type="checkbox" value="water" checked> Agua</label>
+                    <label><input type="checkbox" value="custom" checked> Personalizados</label>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Prioridades</label>
+                <div class="priority-filter">
+                    <label><input type="checkbox" value="low" checked> Baja</label>
+                    <label><input type="checkbox" value="medium" checked> Media</label>
+                    <label><input type="checkbox" value="high" checked> Alta</label>
+                    <label><input type="checkbox" value="urgent" checked> Urgente</label>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Opciones</label>
+                <div class="options-filter">
+                    <label><input type="checkbox" id="filter-important"> Solo importantes</label>
+                    <label><input type="checkbox" id="filter-repeating"> Solo repetitivos</label>
+                    <label><input type="checkbox" id="filter-overdue"> Solo vencidos</label>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="primary-button" id="applyFilters">Aplicar Filtros</button>
+                <button class="secondary-button" id="clearFilters">Limpiar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <div id="delete-reminder-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-trash-alt"></i> Eliminar Recordatorio</h3>
+                <button class="close-modal" data-modal-id="delete-reminder-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar el recordatorio "<span id="delete-reminder-title"></span>"?</p>
+                <input type="hidden" id="delete-reminder-id">
+            </div>
+            <div class="modal-footer">
+                <button class="danger-button" id="confirm-delete-reminder-btn">Eliminar</button>
+                <button class="secondary-button close-modal" data-modal-id="delete-reminder-modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="medibot-toggle" id="medibotToggle" role="button" aria-expanded="false" aria-controls="medibotContainer">
+        <i class="fa-solid fa-user-doctor"></i>
+        <span class="notification-badge hidden" id="notificationBadge" aria-live="polite" aria-atomic="true">1</span>
+    </div>
+
+    <div class="medibot-container" id="medibotContainer" aria-live="polite" aria-atomic="true" role="dialog" aria-labelledby="medibotHeaderTitle">
+        <div class="medibot-header" id="medibotHeader">
+            <div class="header-content">
+                <i class="fas fa-robot"></i>
+                <h2 id="medibotHeaderTitle">MediBot</h2>
+                <span class="connection-status">
+                    <i class="fas fa-circle online-status" aria-hidden="true"></i>
+                    Online
+                </span>
+            </div>
+            <div class="header-controls">
+                <button class="control-btn" id="medibotVoice" aria-label="Activar/Desactivar voz">
+                    <i class="fas fa-volume-up" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotMinimize" aria-label="Minimizar chatbot">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                </button>
+                <button class="control-btn" id="medibotClose" aria-label="Cerrar chatbot">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="medibot-messages" id="medibotMessages" role="log" aria-live="polite"></div>
+
+        <div class="medibot-quick-actions" id="medibotQuickActions" role="group" aria-label="Acciones rápidas del chatbot"></div>
+
+        <div class="medibot-input-area">
+            <input type="text" class="medibot-input" id="medibotInput" placeholder="Escribe tu mensaje..." aria-label="Escribe tu mensaje">
+            <button class="voice-btn" id="medibotVoiceInput" aria-label="Entrada de voz">
+                <i class="fas fa-microphone" aria-hidden="true"></i>
+            </button>
+            <button class="send-btn" id="medibotSend" aria-label="Enviar mensaje">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+    
+    <script src="sidebar/sidebar.js"></script>
+    <script src="medibot/medibot.js"></script>
+    <script src="Scripts/RecordatoriosExtra.js"></script>
+</body>
+</html>

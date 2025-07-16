@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Acceso</title>
+    <link rel="stylesheet" href="Login/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i> <h1>MediTrack</h1>
+            </div>
+            <h2>Bienvenido a MediTrack</h2>
+            <p>Tu asistente personal de salud. Gestiona tus citas, medicación, historial médico y recibe consejos personalizados para un bienestar óptimo.</p>
+            <div class="icons">
+                <i class="fas fa-plus-circle"></i> <i class="fas fa-calendar-alt"></i> <i class="fas fa-pills"></i> </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="form-container">
+                <h2 id="form-title">Iniciar Sesión</h2> <form id="login-form" class="active">
+                    <div class="input-group">
+                        <label for="login-username">Usuario</label>
+                        <input type="text" id="login-username" placeholder="Tu nombre de usuario" required>
+                    </div>
+                    <div class="input-group password-group">
+                        <label for="login-password">Contraseña</label>
+                        <div class="input-with-icon"> <input type="password" id="login-password" placeholder="Tu contraseña" required>
+                            <span class="toggle-password" onclick="togglePasswordVisibility('login-password')">
+                                <i class="fas fa-eye"></i> </span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                    <a href="#" class="forgot-password" id="show-forgot-password">¿Olvidaste tu contraseña?</a>
+                    <p class="switch-form">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
+                </form>
+
+                <form id="register-form">
+                    <div class="input-group">
+                        <label for="register-fullname">Nombre Completo</label>
+                        <input type="text" id="register-fullname" placeholder="Tu nombre completo" required>
+                        <p class="error-message" id="register-fullname-error"></p>
+                    </div>
+                    <div class="input-group">
+                        <label for="register-username">Usuario</label>
+                        <input type="text" id="register-username" placeholder="Elige un nombre de usuario" required>
+                        <p class="error-message" id="register-username-error"></p>
+                    </div>
+                    <div class="input-group password-group">
+                        <label for="register-password">Contraseña</label>
+                        <div class="input-with-icon"> <input type="password" id="register-password" placeholder="Crea una contraseña" required>
+                            <span class="toggle-password" onclick="togglePasswordVisibility('register-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="password-strength" id="register-password-strength"></div>
+                        <p class="error-message" id="register-password-error"></p>
+                    </div>
+                    <div class="input-group password-group">
+                        <label for="register-confirm-password">Confirmar Contraseña</label>
+                        <div class="input-with-icon"> <input type="password" id="register-confirm-password" placeholder="Repite tu contraseña" required>
+                            <span class="toggle-password" onclick="togglePasswordVisibility('register-confirm-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <p class="error-message" id="register-confirm-password-error"></p>
+                    </div>
+                    <button type="submit" class="btn-primary">Registrarse</button>
+                    <p class="switch-form">¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar Sesión</a></p>
+                </form>
+
+                <form id="forgot-password-form">
+                    <div class="input-group">
+                        <label for="forgot-email">Correo Electrónico</label>
+                        <input type="email" id="forgot-email" placeholder="Ingresa tu correo electrónico" required>
+                        <p class="error-message" id="forgot-email-error"></p>
+                    </div>
+                    <button type="submit" class="btn-primary">Enviar Código de Recuperación</button>
+                    <p class="switch-form">¿Recordaste tu contraseña? <a href="#" id="show-login-from-forgot">Iniciar Sesión</a></p>
+                </form>
+
+                <form id="reset-password-form">
+                    <div class="input-group">
+                        <label for="reset-code">Código de Verificación</label>
+                        <input type="text" id="reset-code" placeholder="Ingresa el código de 6 dígitos" maxlength="6" required>
+                        <p class="error-message" id="reset-code-error"></p>
+                    </div>
+                    <div class="input-group password-group">
+                        <label for="reset-new-password">Nueva Contraseña</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="reset-new-password" placeholder="Nueva contraseña" required>
+                            <span class="toggle-password" onclick="togglePasswordVisibility('reset-new-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="password-strength" id="reset-password-strength"></div>
+                        <p class="error-message" id="reset-new-password-error"></p>
+                    </div>
+                    <div class="input-group password-group">
+                        <label for="reset-confirm-password">Confirmar Nueva Contraseña</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="reset-confirm-password" placeholder="Confirma la nueva contraseña" required>
+                            <span class="toggle-password" onclick="togglePasswordVisibility('reset-confirm-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <p class="error-message" id="reset-confirm-password-error"></p>
+                    </div>
+                    <button type="submit" class="btn-primary">Cambiar Contraseña</button>
+                    <p class="switch-form">¿Recordaste tu contraseña? <a href="#" id="show-login-from-reset">Iniciar Sesión</a></p>
+                </form>
+
+                <div id="message-box" class="message-box">
+                    <p id="message-text"></p>
+                    <button id="message-close" class="btn-close">X</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="Login/login.js"></script>
+</body>
+</html>
