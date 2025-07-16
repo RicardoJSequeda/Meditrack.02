@@ -1,0 +1,157 @@
+<!-- Barra de navegación superior compacta y optimizada -->
+<nav class="top-navbar" id="topNavbar">
+    <!-- Header del navbar -->
+    <div class="navbar-header">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="logo-text">
+                <h1 class="app-title">MediTrack</h1>
+                <span class="app-subtitle">Tu salud, nuestra prioridad</span>
+            </div>
+        </div>
+        <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Navegación principal compacta -->
+    <div class="navbar-nav" id="navbarNav">
+        <ul class="navbar-menu">
+            <!-- Inicio -->
+            <li class="nav-item">
+                <a href="Inicio.html" class="nav-link" data-page="Inicio" data-tooltip="Dashboard principal">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Inicio</span>
+                    </div>
+                    <div class="nav-badge" data-badge="3">3</div>
+                </a>
+            </li>
+
+            <!-- Mis Citas -->
+            <li class="nav-item">
+                <a href="Citas.html" class="nav-link" data-page="Citas" data-tooltip="Gestión de citas">
+                    <div class="nav-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Mis Citas</span>
+                    </div>
+                    <div class="nav-badge urgent" data-badge="2">2</div>
+                </a>
+            </li>
+
+            <!-- Emergencia -->
+            <li class="nav-item">
+                <a href="emergencia.html" class="nav-link" data-page="emergencia" data-tooltip="Contactos de emergencia">
+                    <div class="nav-icon emergency">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Emergencia</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Informe Semanal -->
+            <li class="nav-item">
+                <a href="InformeSemanal.html" class="nav-link" data-page="InformeSemanal" data-tooltip="Análisis de salud">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Informe</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Historial Médico -->
+            <li class="nav-item">
+                <a href="HistorialMedico.html" class="nav-link" data-page="HistorialMedico" data-tooltip="Registros médicos">
+                    <div class="nav-icon">
+                        <i class="fas fa-notes-medical"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Historial</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Consejos de Salud -->
+            <li class="nav-item">
+                <a href="ConsejosSalud.html" class="nav-link" data-page="ConsejosSalud" data-tooltip="Recomendaciones">
+                    <div class="nav-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Consejos</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Notas Personales -->
+            <li class="nav-item">
+                <a href="NotasPersonales.html" class="nav-link" data-page="NotasPersonales" data-tooltip="Notas y observaciones">
+                    <div class="nav-icon">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Notas</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Recordatorios Extra -->
+            <li class="nav-item">
+                <a href="RecordatoriosExtra.html" class="nav-link" data-page="RecordatoriosExtra" data-tooltip="Alertas y notificaciones">
+                    <div class="nav-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-text">Recordatorios</span>
+                    </div>
+                    <div class="nav-badge" data-badge="5">5</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Perfil de usuario compacto - Ahora es un enlace hacia la página de perfil -->
+    <div class="navbar-profile">
+        <a href="PerfilConfiguracion.html" class="user-profile-link" data-tooltip="Ir a Perfil y Configuración">
+            <div class="user-profile">
+                <div class="user-avatar-container">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Usuario" class="user-avatar">
+                    <div class="user-status online"></div>
+                </div>
+        <div class="user-info">
+                    <h4 class="user-name" id="sidebarUserName">Cargando...</h4>
+                <span class="user-role">Paciente</span>
+                </div>
+                <div class="user-actions">
+                    <button class="user-action-btn" title="Configuración rápida" onclick="showQuickSettings(); event.preventDefault();">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="user-action-btn" title="Cerrar sesión" onclick="handleLogout(); event.preventDefault();">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </a>
+        
+        <!-- Estado del sistema compacto -->
+        <div class="system-status">
+            <div class="status-item">
+                <i class="fas fa-circle status-indicator online"></i>
+                <span class="status-text">Online</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay para móviles -->
+    <div class="navbar-overlay" id="navbarOverlay"></div>
+</nav>

@@ -1,0 +1,1066 @@
+/* Variables CSS para una fácil personalización y coherencia visual */
+:root {
+    --primary-color: #26a69a; /* Azul principal para elementos clave */
+    --primary-dark: #00796b; /* Tono más oscuro para estados hover/active */
+    --secondary-color: #80cbc4; /* Color secundario, si se necesita para acentos */
+    --emergency-color: #e74c3c; /* Rojo para alertas y botones de emergencia */
+    --emergency-dark: #c0392b; /* Rojo más oscuro para hover de emergencia */
+    --emergency-color-rgb: 231, 76, 60; /* Valores RGB para el color de emergencia */
+    --text-color: #333; /* Color de texto principal para legibilidad */
+    --light-text-color: #555; /* Color de texto secundario o para detalles */
+    --bg-color: #f5f7fa; /* Fondo general del área de mensajes del chat */
+    --chat-bg: #fff; /* Fondo del contenedor principal del chatbot */
+    --user-msg-bg: #e0f2f7; /* Fondo para mensajes del usuario (azul claro) */
+    --bot-msg-bg: #f0f4f8; /* Fondo para mensajes del bot (gris claro) */
+    --border-color: #ddd; /* Color general de bordes */
+    --border-radius: 12px; /* Radio de borde general para elementos redondeados */
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra estándar para profundidad */
+    --success-color: #2ecc71; /* Verde para indicadores de éxito o estado online */
+    --warning-color: #f39c12; /* Naranja para advertencias */
+    --voice-active-color: #ff4500; /* Naranja rojizo para indicar micrófono activo */
+    --color-accent: #4db6ac; /* Nuevo color de acento */
+    --color-primary-light: #b2dfdb; /* Nuevo color primario claro */
+}
+
+/* Restablecimiento básico de CSS para asegurar consistencia entre navegadores */
+* {
+    box-sizing: border-box; /* Incluye padding y border en el ancho/alto total del elemento */
+    margin: 0; /* Elimina márgenes predeterminados */
+    padding: 0; /* Elimina rellenos predeterminados */
+}
+
+/* Estilos para el cuerpo del documento */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente legible */
+    line-height: 1.6; /* Altura de línea para mejor legibilidad */
+    color: var(--text-color); /* Color de texto predeterminado */
+}
+
+/* --- Botón flotante para abrir/cerrar el chatbot --- */
+.medibot-toggle {
+    position: fixed; /* Fija el botón en la ventana de visualización */
+    bottom: 25px; /* Distancia desde la parte inferior */
+    right: 25px; /* Distancia desde la derecha (parte inferior derecha) */
+    width: 65px; /* Ancho del botón ligeramente más grande */
+    height: 65px; /* Altura del botón ligeramente más grande */
+    background-color: var(--primary-color); /* Color de fondo del botón */
+    color: white; /* Color del icono */
+    border: none; /* Sin borde */
+    border-radius: 50%; /* Hace que el botón sea redondo */
+    display: flex; /* Usa flexbox para centrar el contenido */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    cursor: pointer; /* Cambia el cursor para indicar que es interactivo */
+    box-shadow: var(--box-shadow); /* Aplica una sombra para darle profundidad */
+    z-index: 1000; /* Asegura que esté por encima de la mayoría de los elementos */
+    transition: all 0.3s ease; /* Transición suave para cambios de estado */
+}
+
+.medibot-toggle:hover {
+    background-color: var(--primary-dark); /* Color más oscuro al pasar el ratón */
+    transform: scale(1.1); /* Agranda ligeramente el botón al pasar el ratón */
+}
+
+/* Animación de pulso para el botón flotante (ej. cuando hay nueva notificación y está cerrado) */
+.medibot-toggle.pulse {
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Animación y tamaño para el icono del doctor dentro del botón de toggle */
+.medibot-toggle i {
+    font-size: 2.2rem; /* Tamaño del icono más grande para mayor visibilidad */
+    animation: floatAnimation 3s ease-in-out infinite; /* Aplica la animación de flotación */
+}
+
+/* Insignia de notificación en el botón flotante */
+.notification-badge {
+    position: absolute; /* Posiciona la insignia de forma absoluta respecto al botón padre */
+    top: -5px; /* Desplazamiento hacia arriba */
+    right: -5px; /* Desplazamiento hacia la derecha */
+    background-color: var(--emergency-color); /* Color de fondo rojo para la notificación */
+    color: white; /* Color del texto de la notificación */
+    border-radius: 50%; /* Hace que la insignia sea redonda */
+    width: 20px; /* Ancho de la insignia */
+    height: 20px; /* Altura de la insignia */
+    display: flex; /* Usa flexbox para centrar el número */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    font-size: 0.7rem; /* Tamaño de fuente del número */
+    font-weight: bold; /* Texto en negrita */
+    opacity: 1; /* Inicialmente visible */
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Transición suave para ocultar/mostrar y tamaño */
+    transform: scale(1);
+}
+
+.notification-badge.hidden {
+    opacity: 0; /* Oculta la insignia */
+    pointer-events: none; /* Evita interacciones cuando está oculta */
+    transform: scale(0.5); /* Reduce el tamaño al ocultar */
+}
+
+
+/* --- Contenedor principal del chatbot --- */
+.medibot-container {
+    position: fixed; /* Fija el chatbot en la ventana de visualización */
+    bottom: 25px; /* Distancia desde la parte inferior */
+    right: 25px; /* Distancia desde la derecha (parte inferior derecha) */
+    width: 380px; /* Ancho fijo del chatbot */
+    max-height: 600px; /* Altura máxima para evitar que sea demasiado grande */
+    background-color: var(--chat-bg); /* Fondo del contenedor */
+    border-radius: var(--border-radius); /* Esquinas redondeadas */
+    box-shadow: var(--box-shadow); /* Sombra para profundidad */
+    display: flex; /* Usa flexbox para organizar el contenido verticalmente */
+    flex-direction: column; /* Apila los elementos verticalmente */
+    z-index: 1001; /* Asegura que esté por encima del botón flotante */
+    /* Animación de entrada */
+    transform: translateY(20px); /* Ligeramente desplazado hacia abajo al inicio */
+    opacity: 0; /* Inicialmente transparente */
+    visibility: hidden; /* Oculto para lectores de pantalla y clics */
+    transition: all 0.3s ease; /* Transición suave para la animación de entrada */
+}
+
+.medibot-container.active {
+    transform: translateY(0); /* Vuelve a su posición original */
+    opacity: 1; /* Se vuelve completamente visible */
+    visibility: visible; /* Visible para lectores de pantalla y clics */
+}
+
+/* Estado minimizado del chatbot */
+.medibot-container.minimized {
+    height: 60px; /* Solo la altura del encabezado */
+    max-height: 60px; /* Restringe la altura máxima */
+    overflow: hidden; /* Oculta el contenido inferior cuando está minimizado */
+    /* Animación de minimizado */
+    transition: height 0.3s ease, max-height 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* --- Encabezado del chatbot --- */
+.medibot-header {
+    background-color: var(--primary-color); /* Color de fondo del encabezado */
+    color: white; /* Color del texto en el encabezado */
+    padding: 15px; /* Relleno interno */
+    border-top-left-radius: var(--border-radius); /* Esquinas superiores redondeadas */
+    border-top-right-radius: var(--border-radius);
+    display: flex; /* Usa flexbox para organizar el contenido */
+    justify-content: space-between; /* Espacio entre el contenido del encabezado y los controles */
+    align-items: center; /* Centra verticalmente los elementos */
+    cursor: pointer; /* Cambia el cursor para indicar que es clickeable (para minimizar) */
+    transition: background-color 0.2s ease; /* Transición para el color de fondo */
+}
+
+.medibot-header:hover {
+    background-color: var(--primary-dark); /* Color más oscuro al pasar el ratón */
+}
+
+.header-content {
+    display: flex; /* Usa flexbox para organizar el icono, título y estado de conexión */
+    align-items: center; /* Centra verticalmente */
+    gap: 10px; /* Espacio entre los elementos */
+}
+
+.header-content i {
+    font-size: 1.2rem; /* Tamaño del icono en el encabezado */
+}
+
+.header-content h2 {
+    font-size: 1.2rem; /* Tamaño de fuente del título */
+    margin: 0; /* Elimina márgenes predeterminados */
+    font-weight: 600; /* Peso de la fuente */
+}
+
+.connection-status {
+    font-size: 0.8rem; /* Tamaño de fuente para el estado de conexión */
+    display: flex; /* Usa flexbox para organizar el punto y el texto */
+    align-items: center; /* Centra verticalmente */
+    gap: 5px; /* Espacio entre el punto y el texto */
+}
+
+.online-status {
+    color: var(--success-color); /* Color verde para el punto "online" */
+    font-size: 0.6rem; /* Tamaño del punto */
+}
+
+.header-controls {
+    display: flex; /* Usa flexbox para organizar los botones de control */
+    gap: 10px; /* Espacio entre los botones */
+}
+
+.control-btn {
+    background: none; /* Sin fondo */
+    border: none; /* Sin borde */
+    color: white; /* Color del icono */
+    cursor: pointer; /* Cambia el cursor */
+    font-size: 1rem; /* Tamaño del icono */
+    width: 30px; /* Ancho del botón */
+    height: 30px; /* Altura del botón */
+    border-radius: 50%; /* Hace el botón redondo */
+    display: flex; /* Usa flexbox para centrar el icono */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Transición suave para color y escala */
+}
+
+.control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo semitransparente al pasar el ratón */
+}
+
+.control-btn:active {
+    transform: scale(0.9); /* Efecto de "presión" al hacer clic */
+}
+
+/* Estilos específicos para el botón de voz */
+.control-btn#medibotVoice {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.control-btn#medibotVoice:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.control-btn#medibotVoice.active {
+    background-color: var(--voice-active-color);
+    animation: pulse-voice 2s infinite;
+}
+
+.control-btn#medibotVoice.active i {
+    color: white;
+}
+
+/* Indicador de voz activa */
+.control-btn#medibotVoice::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--success-color);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.control-btn#medibotVoice.active::after {
+    opacity: 1;
+    animation: pulse 1.5s infinite;
+}
+
+/* --- Área de mensajes --- */
+.medibot-messages {
+    flex: 1; /* Permite que esta área ocupe el espacio restante en el contenedor */
+    padding: 15px; /* Relleno interno */
+    overflow-y: auto; /* Habilita el scroll vertical si el contenido excede la altura */
+    display: flex; /* Usa flexbox para organizar los mensajes */
+    flex-direction: column; /* Apila los mensajes verticalmente */
+    gap: 12px; /* Espacio entre mensajes */
+    background-color: var(--bg-color); /* Color de fondo del área de chat */
+    /* Estilos de scrollbar personalizados para navegadores basados en Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) transparent;
+}
+
+/* Estilos de scrollbar personalizados para navegadores basados en WebKit (Chrome, Safari) */
+.medibot-messages::-webkit-scrollbar {
+    width: 6px; /* Ancho de la barra de desplazamiento */
+}
+
+.medibot-messages::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color); /* Color del "pulgar" de la barra de desplazamiento */
+    border-radius: 3px; /* Bordes redondeados del pulgar */
+}
+
+.message {
+    max-width: 85%; /* Ancho máximo para legibilidad de los mensajes */
+    padding: 12px 16px; /* Relleno interno del mensaje */
+    border-radius: 18px; /* Bordes redondeados del globo de mensaje */
+    line-height: 1.5; /* Altura de línea para mejor legibilidad del texto */
+    font-size: 0.95rem; /* Tamaño de fuente del mensaje */
+    animation: fadeIn 0.3s ease forwards; /* Animación de entrada para nuevos mensajes */
+    word-wrap: break-word; /* Asegura que palabras largas se rompan y no desborden el contenedor */
+}
+
+.user-message {
+    align-self: flex-end; /* Alinea los mensajes del usuario a la derecha */
+    background-color: var(--user-msg-bg); /* Color de fondo para mensajes del usuario */
+    border-bottom-right-radius: 5px; /* Esquina inferior derecha menos redondeada para un estilo de "burbuja" */
+    color: var(--text-color); /* Color del texto */
+}
+
+.bot-message {
+    align-self: flex-start; /* Alinea los mensajes del bot a la izquierda */
+    background-color: var(--bot-msg-bg); /* Color de fondo para mensajes del bot */
+    border-bottom-left-radius: 5px; /* Esquina inferior izquierda menos redondeada */
+    color: var(--text-color); /* Color del texto */
+}
+
+.message-image {
+    max-width: 100%; /* Asegura que la imagen no desborde el mensaje */
+    border-radius: 10px; /* Bordes redondeados para las imágenes */
+    margin-top: 10px; /* Margen superior */
+    border: 1px solid var(--border-color); /* Borde sutil */
+}
+
+/* Estilo para las "cards" dentro de los mensajes del bot (ej. bienvenida, resumen) */
+.medibot-card {
+    background-color: white; /* Fondo blanco para la tarjeta */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 15px; /* Relleno interno */
+    margin: 5px 0; /* Margen superior e inferior */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    border-left: 4px solid var(--primary-color); /* Borde decorativo a la izquierda */
+    animation: fadeIn 0.4s ease forwards; /* Animación para las tarjetas */
+}
+
+.medibot-card h4 {
+    margin-top: 0; /* Elimina margen superior predeterminado */
+    margin-bottom: 10px; /* Margen inferior */
+    color: var(--primary-color); /* Color del título de la tarjeta */
+    font-size: 1rem; /* Tamaño de fuente del título */
+    display: flex; /* Usa flexbox para alinear icono y texto */
+    align-items: center; /* Centra verticalmente */
+    gap: 8px; /* Espacio entre icono y texto */
+}
+
+.medibot-card p {
+    margin-bottom: 10px; /* Margen inferior */
+    font-size: 0.9rem; /* Tamaño de fuente del párrafo */
+    color: var(--light-text-color); /* Color de texto más claro */
+}
+
+.medibot-card ul, .medibot-card ol {
+    padding-left: 20px; /* Relleno a la izquierda para listas */
+    margin-bottom: 10px; /* Margen inferior */
+    font-size: 0.9rem; /* Tamaño de fuente de los ítems de lista */
+    color: var(--light-text-color); /* Color de texto más claro */
+}
+
+.medibot-card hr {
+    border: none; /* Sin borde */
+    border-top: 1px solid var(--border-color); /* Borde superior como separador */
+    margin: 10px 0; /* Margen superior e inferior */
+}
+
+/* Estilo para el "tip" dentro de los mensajes motivacionales */
+.tip {
+    font-style: italic; /* Texto en cursiva */
+    color: var(--primary-dark); /* Color más oscuro */
+    font-size: 0.85rem; /* Tamaño de fuente más pequeño */
+    margin-top: 10px; /* Margen superior */
+}
+
+/* --- Acciones rápidas (botones debajo del chat) --- */
+.medibot-quick-actions {
+    display: flex; /* Usa flexbox para organizar los botones */
+    flex-wrap: wrap; /* Permite que los botones se envuelvan a la siguiente línea si no hay espacio */
+    gap: 8px; /* Espacio entre los botones */
+    padding: 12px; /* Relleno interno */
+    border-top: 1px solid #eee; /* Borde superior para separar del área de mensajes */
+    border-bottom: 1px solid #eee; /* Borde inferior para separar del área de entrada */
+    background-color: white; /* Fondo blanco */
+}
+
+.quick-action-btn {
+    padding: 8px 12px; /* Relleno interno del botón */
+    background-color: var(--color-primary-light); /* Fondo azul claro */
+    color: var(--primary-color); /* Color del texto */
+    border: none; /* Sin borde */
+    border-radius: 20px; /* Bordes muy redondeados para un aspecto de "píldora" */
+    font-size: 0.85rem; /* Tamaño de fuente */
+    cursor: pointer; /* Cambia el cursor */
+    transition: all 0.2s ease; /* Transición suave para todos los cambios */
+    display: flex; /* Usa flexbox para alinear icono y texto */
+    align-items: center; /* Centra verticalmente */
+    gap: 5px; /* Espacio entre icono y texto */
+    flex-shrink: 0; /* Evita que los botones se encojan en pantallas pequeñas */
+    font-weight: bold; /* Texto en negrita para mejor visibilidad */
+}
+
+.quick-action-btn:hover {
+    background-color: var(--secondary-color); /* Fondo más oscuro al pasar el ratón */
+    transform: translateY(-2px); /* Pequeño levantamiento al pasar el ratón */
+}
+
+.quick-action-btn:active {
+    transform: scale(0.95); /* Efecto de "presión" al hacer clic */
+}
+
+/* Estilo específico para el botón de emergencia */
+.quick-action-btn.emergency-btn {
+    background-color: var(--emergency-color); /* Fondo rojo de emergencia */
+    color: white; /* Texto blanco */
+    font-weight: bold; /* Texto en negrita */
+    box-shadow: 0 0 15px rgba(var(--emergency-color-rgb), 0.6); /* Sombra más pronunciada y roja */
+    border: 2px solid var(--emergency-dark); /* Borde más grueso y oscuro para resaltar */
+    transition: all 0.3s ease; /* Asegurar transición suave */
+}
+
+.quick-action-btn.emergency-btn i { /* Asegura que el icono también sea blanco */
+    color: white;
+}
+
+.quick-action-btn.emergency-btn:hover {
+    background-color: var(--emergency-dark); /* Tono más oscuro al pasar el ratón */
+    transform: scale(1.02); /* Ligeramente más grande al pasar el ratón */
+    box-shadow: 0 0 20px rgba(var(--emergency-color-rgb), 0.8); /* Sombra aún más intensa en hover */
+}
+
+/* Estilo para el indicador de escritura "..." */
+.typing-indicator {
+    display: flex; /* Usa flexbox para alinear los puntos */
+    align-items: center; /* Centra verticalmente */
+    gap: 4px; /* Espacio entre los puntos */
+    margin-top: 10px; /* Margen superior */
+    color: var(--light-text-color); /* Color de texto más claro */
+    font-size: 0.85rem; /* Tamaño de fuente */
+    animation: fadeIn 0.3s ease forwards; /* Animación de entrada */
+}
+
+.typing-indicator span {
+    width: 6px; /* Ancho del punto */
+    height: 6px; /* Altura del punto */
+    background-color: var(--primary-color); /* Color del punto */
+    border-radius: 50%; /* Hace el punto redondo */
+    animation: bounce 1.4s infinite ease-in-out; /* Animación de rebote */
+}
+
+/* Retrasos para la animación de cada punto */
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* --- Área de entrada de texto y botones --- */
+.medibot-input-area {
+    display: flex; /* Usa flexbox para alinear el input y los botones */
+    padding: 12px; /* Relleno interno */
+    background-color: white; /* Fondo blanco */
+    border-bottom-left-radius: var(--border-radius); /* Esquinas inferiores redondeadas */
+    border-bottom-right-radius: var(--border-radius);
+    align-items: center; /* Centra verticalmente */
+    gap: 8px; /* Espacio entre los elementos */
+}
+
+.medibot-input {
+    flex: 1; /* Permite que el input ocupe el espacio disponible */
+    padding: 10px 15px; /* Relleno interno */
+    border: 1px solid var(--border-color); /* Borde del input */
+    border-radius: 20px; /* Bordes redondeados */
+    outline: none; /* Quita el contorno al enfocar */
+    font-size: 0.95rem; /* Tamaño de fuente */
+    transition: border-color 0.2s ease; /* Transición suave para el color del borde */
+}
+
+.medibot-input:focus {
+    border-color: var(--primary-color); /* Cambia el color del borde al enfocar */
+}
+
+/* Estilos para el botón de voz y enviar */
+.voice-btn, .send-btn {
+    width: 40px; /* Ancho del botón */
+    height: 40px; /* Altura del botón */
+    border-radius: 50%; /* Hace el botón redondo */
+    border: none; /* Sin borde */
+    background-color: var(--primary-color); /* Color de fondo */
+    color: white; /* Color del icono */
+    cursor: pointer; /* Cambia el cursor */
+    display: flex; /* Usa flexbox para centrar el icono */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Transición suave */
+    flex-shrink: 0; /* Evita que el botón se encoja */
+}
+
+.voice-btn:hover, .send-btn:hover {
+    background-color: var(--primary-dark); /* Color más oscuro al pasar el ratón */
+}
+
+.voice-btn:active, .send-btn:active {
+    transform: scale(0.9); /* Efecto de "presión" al hacer clic */
+}
+
+/* Animación de pulso para el botón de voz cuando está activo (escuchando) */
+.voice-btn.active {
+    background-color: var(--voice-active-color); /* Color de fondo cuando está activo */
+    animation: pulse-voice 1s infinite ease-out; /* Animación de pulso */
+    color: white;
+}
+
+.voice-btn.active i {
+    color: white;
+}
+
+/* Indicador de grabación de voz */
+.voice-btn.recording {
+    background-color: var(--emergency-color);
+    animation: pulse-voice 1s infinite;
+    color: white;
+    position: relative;
+}
+
+.voice-btn.recording i {
+    color: white;
+}
+
+.voice-btn.recording::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--emergency-color);
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+}
+
+/* Estilos para mensajes de error */
+.medibot-card.error-message {
+    border-left-color: var(--emergency-color);
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+}
+
+.medibot-card.error-message h4 {
+    color: var(--emergency-color);
+}
+
+.medibot-card.error-message h4 i {
+    color: var(--emergency-color);
+}
+
+/* --- Animaciones Keyframes --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); } /* Desde transparente y ligeramente abajo */
+    to { opacity: 1; transform: translateY(0); } /* Hasta opaco y en su posición */
+}
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); } /* Los puntos se encogen */
+    40% { transform: scale(1); } /* Los puntos se agrandan */
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(38, 166, 154, 0.7); } /* Usando primary-color */
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(38, 166, 154, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(38, 166, 154, 0); }
+}
+
+@keyframes pulse-voice {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 69, 0, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(255, 69, 0, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 69, 0, 0); }
+}
+
+@keyframes floatAnimation {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); } /* Mueve el icono ligeramente hacia arriba */
+    100% { transform: translateY(0px); }
+}
+
+/* --- Responsividad básica (ajusta según necesites) --- */
+@media (max-width: 600px) {
+    .medibot-container {
+        width: 95%; /* Ocupa casi todo el ancho en móviles */
+        left: 2.5%; /* Centrado horizontalmente */
+        right: 2.5%;
+        bottom: 15px; /* Menos margen inferior */
+        max-height: 80vh; /* Altura máxima del 80% del viewport */
+    }
+
+    .medibot-toggle {
+        right: 15px; /* Menos margen a la derecha */
+        bottom: 15px; /* Menos margen inferior */
+        width: 55px; /* Tamaño más pequeño */
+        height: 55px;
+        font-size: 1.5rem; /* Tamaño de fuente del icono */
+    }
+
+    .medibot-toggle i {
+        font-size: 1.8rem; /* Tamaño del icono más pequeño en móviles */
+    }
+
+    .medibot-header {
+        padding: 12px; /* Menos relleno */
+    }
+
+    .header-content h2 {
+        font-size: 1.1rem; /* Tamaño de fuente más pequeño para el título */
+    }
+
+    .medibot-messages,
+    .medibot-quick-actions,
+    .medibot-input-area {
+        padding: 10px; /* Menos relleno en estas áreas */
+    }
+
+    .message {
+        font-size: 0.9rem; /* Tamaño de fuente más pequeño para los mensajes */
+        padding: 10px 14px;
+    }
+
+    .quick-action-btn {
+        font-size: 0.8rem; /* Tamaño de fuente más pequeño para los botones de acción rápida */
+        padding: 7px 10px;
+    }
+
+    .medibot-input {
+        font-size: 0.9rem; /* Tamaño de fuente más pequeño para el input */
+        padding: 9px 14px;
+    }
+
+    .voice-btn, .send-btn {
+        width: 35px; /* Tamaño más pequeño para los botones de enviar y voz */
+        height: 35px;
+    }
+}
+
+/* --- Estilos para accesibilidad (ej. si se activa con JS) --- */
+/* Estilos para modo de alto contraste */
+.high-contrast .medibot-container {
+    border: 2px solid #000; /* Borde más grueso y oscuro */
+}
+
+.high-contrast .medibot-header {
+    background-color: #000; /* Fondo negro */
+    color: #fff; /* Texto blanco */
+}
+
+.high-contrast .user-message {
+    background-color: #000; /* Fondo negro para mensajes del usuario */
+    color: #fff; /* Texto blanco */
+}
+
+.high-contrast .medibot-input {
+    border-color: #000; /* Borde negro para el input */
+}
+
+.high-contrast .send-btn,
+.high-contrast .medibot-toggle,
+.high-contrast .quick-action-btn,
+.high-contrast .voice-btn { /* Añadido .voice-btn */
+    background-color: #000; /* Fondo negro para botones */
+    color: #fff; /* Texto blanco */
+    border: 1px solid #fff; /* Borde blanco para mayor contraste */
+}
+
+/* Estilos para texto grande */
+.large-text .medibot-message,
+.large-text .medibot-card p,
+.large-text .medibot-card ul li,
+.large-text .large-text .medibot-card ol li {
+    font-size: 1.1rem; /* Aumenta el tamaño de fuente para mensajes y contenido de tarjeta */
+}
+
+.large-text .medibot-input,
+.large-text .quick-action-btn,
+.large-text .voice-btn,
+.large-text .send-btn { /* Añadido .voice-btn y .send-btn */
+    font-size: 1rem; /* Aumenta el tamaño de fuente para input y botones de acción rápida */
+}
+
+/* Estilos para el contexto inteligente y información relevante */
+.context-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 10px 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.context-info h5 {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.context-info ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.context-info li {
+    font-size: 0.85rem;
+    color: var(--light-text-color);
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.context-info strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+/* Mejoras para las tarjetas de información */
+.medibot-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin: 8px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.medibot-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.medibot-card h4 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid var(--color-primary-light);
+    padding-bottom: 8px;
+}
+
+.medibot-card h4 i {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+/* Estilos para información dinámica */
+.dynamic-info {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 6px;
+    padding: 10px;
+    margin: 8px 0;
+    border-left: 3px solid #2196f3;
+}
+
+.dynamic-info h6 {
+    color: #1976d2;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.dynamic-info p {
+    font-size: 0.85rem;
+    color: #424242;
+    margin: 4px 0;
+}
+
+/* Mejoras para botones de acción contextual */
+.quick-action-btn {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    margin: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quick-action-btn:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #004d40 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quick-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quick-action-btn i {
+    font-size: 0.9rem;
+}
+
+/* Estilos para información de estado */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin: 4px 0;
+}
+
+.status-indicator.success {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.status-indicator.warning {
+    background: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+    border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.status-indicator.info {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+/* Mejoras para el mensaje de bienvenida contextual */
+.welcome-context {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 10px 0;
+    border-left: 4px solid #4caf50;
+}
+
+.welcome-context h5 {
+    color: #2e7d32;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+/* Animaciones mejoradas */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.message.fade-in {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.medibot-card.fade-in {
+    animation: slideInFromRight 0.5s ease-out;
+}
+
+/* Estilos para información de medicamentos pendientes */
+.pending-medications {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border-radius: 6px;
+    padding: 10px;
+    margin: 8px 0;
+    border-left: 3px solid #ff9800;
+}
+
+.pending-medications h6 {
+    color: #e65100;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.medication-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.medication-item:last-child {
+    border-bottom: none;
+}
+
+.medication-name {
+    font-weight: 500;
+    color: #e65100;
+}
+
+.medication-time {
+    font-size: 0.8rem;
+    color: #ff6f00;
+    background: rgba(255, 152, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Estilos para información de citas próximas */
+.upcoming-appointments {
+    background: linear-gradient(135deg, #e8f4fd 0%, #bbdefb 100%);
+    border-radius: 6px;
+    padding: 10px;
+    margin: 8px 0;
+    border-left: 3px solid #2196f3;
+}
+
+.upcoming-appointments h6 {
+    color: #1976d2;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.appointment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.appointment-item:last-child {
+    border-bottom: none;
+}
+
+.appointment-doctor {
+    font-weight: 500;
+    color: #1976d2;
+}
+
+.appointment-details {
+    font-size: 0.8rem;
+    color: #1565c0;
+    text-align: right;
+}
+
+/* Mejoras para el modo responsivo */
+@media (max-width: 600px) {
+    .context-info {
+        padding: 10px;
+        margin: 8px 0;
+    }
+    
+    .context-info h5 {
+        font-size: 0.85rem;
+    }
+    
+    .context-info li {
+        font-size: 0.8rem;
+    }
+    
+    .medibot-card {
+        padding: 12px;
+        margin: 6px 0;
+    }
+    
+    .medibot-card h4 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+    
+    .quick-action-btn {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        margin: 3px;
+    }
+    
+    .status-indicator {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
+    
+    .pending-medications,
+    .upcoming-appointments {
+        padding: 8px;
+        margin: 6px 0;
+    }
+    
+    .medication-item,
+    .appointment-item {
+        padding: 4px 0;
+    }
+    
+    .medication-name,
+    .appointment-doctor {
+        font-size: 0.85rem;
+    }
+    
+    .medication-time,
+    .appointment-details {
+        font-size: 0.75rem;
+    }
+}
+
+/* Estilos para el modo de alto contraste */
+.high-contrast .context-info {
+    background: #000;
+    border-left-color: #fff;
+    color: #fff;
+}
+
+.high-contrast .context-info h5 {
+    color: #fff;
+}
+
+.high-contrast .context-info li {
+    color: #ccc;
+}
+
+.high-contrast .context-info strong {
+    color: #fff;
+}
+
+.high-contrast .medibot-card {
+    background: #000;
+    border-color: #fff;
+    color: #fff;
+}
+
+.high-contrast .medibot-card h4 {
+    color: #fff;
+    border-bottom-color: #fff;
+}
+
+.high-contrast .dynamic-info {
+    background: #000;
+    border-left-color: #fff;
+    color: #fff;
+}
+
+.high-contrast .dynamic-info h6 {
+    color: #fff;
+}
+
+.high-contrast .dynamic-info p {
+    color: #ccc;
+}
+
+/* Estilos para texto grande */
+.large-text .context-info h5 {
+    font-size: 1.1rem;
+}
+
+.large-text .context-info li {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.large-text .medibot-card h4 {
+    font-size: 1.3rem;
+}
+
+.large-text .quick-action-btn {
+    font-size: 1rem;
+    padding: 10px 16px;
+}
+
+.large-text .status-indicator {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+}
